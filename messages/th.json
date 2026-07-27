@@ -10,12 +10,15 @@
         "faqs": "คำถามที่พบบ่อย",
         "login": "ล็อกอิน",
         "login_with_wca": "ล็อกอินด้วย WCA",
+        "close": "ปิด",
         "dropdown": 
         {
             "profile": "หน้าโพรไฟล์",
             "my_competitions": "การแข่งขันของฉัน",
+            "predictions": "ทายผลการแข่งขัน",
             "create_new_competition": "สร้างการแข่งขันใหม่",
             "admin": "ผู้ดูแลระบบ (Admin)",
+            "manage_predictions": "จัดการการทายผล (Admin)",
             "logout": "ออกจากระบบ"
         }
     },

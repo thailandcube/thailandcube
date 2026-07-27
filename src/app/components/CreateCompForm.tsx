@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Button } from '@heroui/react';
@@ -16,7 +17,6 @@ const CreateCompForm = () =>
             return;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const accessToken = (session as any)?.accessToken;
 
         if (!accessToken)
@@ -40,7 +40,6 @@ const CreateCompForm = () =>
             console.log('Competition created:', res.data);
             alert('Competition created successfully!');
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         catch (error: any)
         {
             console.error('Create failed:', error.response?.data || error.message);

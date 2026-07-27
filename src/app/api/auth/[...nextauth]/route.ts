@@ -98,42 +98,53 @@ export const authOptions: NextAuthOptions = {
                 const userData = data.user as User;
                 console.log(data);
 
-                try {
-                    
+                try 
+                {
+                    // 1. Ensure the base User account exists first
                     await prisma.user.upsert({
-                        where: {id: userId},
-                        create: {
-                            id: userId,
-                            competitor: {
-                                create: {
-                                    name: userData.name,
-                                    wcaId: userData.wca_id,
-                                    region: userData.country.iso2
-                                }
-                            }
-                            // competitor: {
-                            //     connectOrCreate: {
-                            //         where: {id: userId},
-                            //         create: {
-                            //             id: userId,
-                            //             name: userData.name!,
-                            //             wcaId: userData.wca_id,
-                            //             region: userData.country.iso2,
-                            //         }
-                            //     }
-                            // }
-                        },
-                        update: {
-                            competitor: {
-                                update: {
-                                    name: userData.name!,
-                                    wcaId: userData.wca_id,
-                                    region: userData.country.iso2
-                                }
-                            }
-                        }
+                        where: { id: userId },
+                        create: { id: userId },
+                        update: {} 
                     });
-                    return true
+
+                    // 2. Safely link or create the Competitor profile
+                    if (userData.wca_id) 
+                    {
+                        // If they have a WCA ID, they might already be in the database from a psych sheet.
+                        // Upserting by WCA ID ensures we link their User ID without creating a duplicate.
+                        await prisma.competitor.upsert({
+                            where: { wcaId: userData.wca_id },
+                            create: {
+                                userId: userId,
+                                wcaId: userData.wca_id,
+                                name: userData.name,
+                                region: userData.country.iso2
+                            },
+                            update: {
+                                userId: userId, // Crucial: Links the pre-existing profile to the user
+                                name: userData.name,
+                                region: userData.country.iso2
+                            }
+                        });
+                    } 
+                    else 
+                    {
+                        // For newcomers without a WCA ID, we strictly manage them by their User ID
+                        await prisma.competitor.upsert({
+                            where: { userId: userId },
+                            create: {
+                                userId: userId,
+                                name: userData.name,
+                                region: userData.country.iso2
+                            },
+                            update: {
+                                name: userData.name,
+                                region: userData.country.iso2
+                            }
+                        });
+                    }
+
+                    return true;
                 }
                 catch (error)
                 {

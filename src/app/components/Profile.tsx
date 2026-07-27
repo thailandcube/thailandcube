@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { Card, CardBody, Avatar } from '@heroui/react';
@@ -38,8 +39,8 @@ const Profile = () =>
                 );
 
                 setProfile(res.data.me);
+                console.log(res.data.me);
             }
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             catch (err: any)
             {
                 console.error(err);

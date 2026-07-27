@@ -4,6 +4,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const nextConfig: NextConfig = {
     /* config options here */
     reactCompiler: true,
+    allowedDevOrigins: ['*.ngrok-free.app']
 };
 
 const withNextIntl = createNextIntlPlugin();

@@ -10,12 +10,15 @@
         "faqs": "FAQs",
         "login": "Login",
         "login_with_wca": "Login with WCA",
+        "close": "Close",
         "dropdown": 
         {
             "profile": "Profile",
             "my_competitions": "My Competitions",
+            "predictions": "Predictions",
             "create_new_competition": "Create New Competitions",
             "admin": "Admin",
+            "manage_predictions": "Manage Predictions (Admin)",
             "logout": "Logout"
         }
     },
@@ -126,5 +129,16 @@
         "format": "Format",
         "time_limit": "Time Limit",
         "ranking": "Proceeding"
+    },
+    "Predictions":
+    {
+        "forms":
+        {
+            "wait":
+            {
+                "title": "Hold your horses! 🐎",
+                "subtitle": "Submissions for Pathum Thani Mini 2026 Predictions open on 6/1/2026, 11:30:00 AM."
+            }
+        }
     }
 }
