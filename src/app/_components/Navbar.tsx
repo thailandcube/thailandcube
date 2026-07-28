@@ -79,7 +79,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className='bg-primary/70 text-primary-foreground mb-5 relative z-40'>
+      <nav className='bg-primary text-primary-foreground mb-5 relative z-40'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between items-center h-16'>
             <div className='flex-shrink-0 flex items-center'>
@@ -94,7 +94,7 @@ export default function Navbar() {
                 <Link 
                   key={menu.href} 
                   href={`/${menu.href}`}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${pathname === `/${menu.href}` ? 'text-primary font-bold' : ''}`}
+                  className={`text-sm font-medium transition-colors hover:text-gray-300 ${pathname === `/${menu.href}` ? 'font-bold underline' : ''}`}
                 >
                   {t(menu.href)}
                 </Link>
@@ -103,7 +103,7 @@ export default function Navbar() {
 
             <div className='hidden sm:flex items-center gap-4'>
               <Dropdown>
-                <Button variant='primary' size='sm'>
+                <Button variant='secondary' size='sm'>
                   <Globe/>
                   {locale === 'th' ? 'ภาษาไทย' : 'English'}
                 </Button>
@@ -158,7 +158,7 @@ export default function Navbar() {
                   </Dropdown.Popover>
                 </Dropdown>
               ) : (
-                <Button variant='primary' onPress={() => handleLoginClick()}>
+                <Button variant='secondary' onPress={() => handleLoginClick()}>
                   {t('login')}
                 </Button>
               )}
@@ -166,23 +166,23 @@ export default function Navbar() {
             <div className='flex items-center sm:hidden'>
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className='p-2 text-gray-800 hover:bg-blue-300 rounded-md transition-colors'
+                className='p-2 text-white-800 hover:bg-danger rounded-md transition-colors'
                 aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
               >
-                {isMenuOpen ? <Xmark className='w-6 h-6' /> : <Bars className='w-6 h-6' />}
+                {isMenuOpen ? <Xmark className='w-6 h-6 text-white' /> : <Bars className='w-6 h-6 text-white' />}
               </button>
             </div>
           </div>
         </div>
         {isMenuOpen && (
-          <div className='sm:hidden bg-blue-100/95 absolute top-full left-0 right-0 shadow-lg border-t border-blue-200 flex flex-col p-4 z-40'>
+          <div className='sm:hidden bg-primary absolute top-full left-0 right-0 shadow-lg border-t border-blue-200 flex flex-col p-4 z-40'>
             <div className='flex flex-col gap-3'>
               {menuItems.map((menu) => (
                 <Link 
                   key={menu.href} 
                   href={`/${menu.href}`}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`text-lg font-medium py-2 ${pathname === `/${menu.href}` ? 'text-blue-700' : 'text-gray-800'}`}
+                  className={`text-lg font-medium py-2 ${pathname === `/${menu.href}` ? 'underline' : ''}`}
                 >
                   {t(menu.href)}
                 </Link>
@@ -220,22 +220,23 @@ export default function Navbar() {
                 <Link href='#' onClick={() => { signOut(); setIsMenuOpen(false); }} className='text-lg text-left text-danger py-2 font-medium'>{t('dropdown.logout')}</Link>
               </div>
             ) : (
-              <Button variant='primary' fullWidth onPress={() => { handleLoginClick() }}>
+              <Button variant='secondary' fullWidth onPress={() => handleLoginClick()}>
                 {t('login')}
               </Button>
             )}
 
             <div className='flex gap-2 mt-6'>
-              <Button size='sm' variant={locale === 'th' ? 'primary' : 'ghost'} onPress={() => switchLocale('th')} className='flex-1'>
+              <Button size='sm' variant={locale === 'th' ? 'secondary' : 'primary'} onPress={() => switchLocale('th')} className='flex-1'>
                 ภาษาไทย
               </Button>
-              <Button size='sm' variant={locale === 'en' ? 'primary' : 'ghost'} onPress={() => switchLocale('en')} className='flex-1'>
+              <Button size='sm' variant={locale === 'en' ? 'secondary' : 'primary'} onPress={() => switchLocale('en')} className='flex-1'>
                 English
               </Button>
             </div>
           </div>
         )}
       </nav>
+      <LoginModal state={loginModalOverlayState}/>
     </>
   );
 }

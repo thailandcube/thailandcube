@@ -9,7 +9,7 @@ export default function Footer() {
   const t = useTranslations('Footer');
 
   return (
-    <footer className='w-full bg-primary/70 text-primary-foreground mt-10'>
+    <footer className='w-full bg-primary text-primary-foreground mt-10'>
       <div className='mx-auto max-w-7xl px-6 py-10'>
         <div className='grid grid-cols-1 gap-10 md:grid-cols-2'>
           {/* Brand section */}

@@ -29,3 +29,9 @@
   --color-danger-foreground: var(--danger-foreground);
   --radius-md: var(--radius);
 }
+
+/* @layer components {
+  .button--primary {
+    @apply bg-primary/70 hover:bg-primary/60;
+  }
+} */
