@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+@import '@heroui/styles';
+
+:root {
+  --background: oklch(0.985 0.015 225);
+  --foreground: oklch(0.145 0 0);
+  --accent: oklch(37.8% 0.156 274.7);
+  --accent-foreground: oklch(1 0 0);
+  --danger: oklch(60.3% 0.235 27);
+  --danger-foreground: oklch(1 1 1);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: oklch(0.145 0.015 225);
+  --foreground: oklch(0.985 0 0);
+  --accent: oklch(65% 0.156 274.7);
+  --accent-foreground: oklch(0.145 0 0);
+  --danger: oklch(65% 0.235 27);
+  --danger-foreground: oklch(0.145 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--accent-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --radius-md: var(--radius);
+}
