@@ -15,7 +15,7 @@ export default function Footer() {
           {/* Brand section */}
           <div className='flex flex-col gap-4'>
             <Image
-              src='/assets/thailandcube.svg'
+              src='/assets/img/thailandcube.svg'
               alt='ThailandCube'
               width={75}
               height={75}

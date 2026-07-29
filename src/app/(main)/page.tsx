@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getLocale, getTranslations } from "next-intl/server";
-import { WcaApiClient } from "../lib/clients/WcaApiClient";
-import CompetitionInfoCard from "./_components/CompetitionInfoCard";
+import { getLocale, getTranslations } from 'next-intl/server';
+import { WcaApiClient } from '../lib/clients/WcaApiClient';
+import CompetitionInfoCard from './_components/CompetitionInfoCard';
 
 export default async function Home() {
   const t = await getTranslations('HomePage');

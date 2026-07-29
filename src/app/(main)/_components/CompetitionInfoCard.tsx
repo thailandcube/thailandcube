@@ -45,28 +45,26 @@ export default function CompetitionInfoCard({competition, isWca=true}: {competit
   if (competition) {
     const markdownData = formatMarkdownHyperlink(competition.venue);
 
-    console.log(competition.name, competition.shortName)
-
     return (
       <>
         <Card className='w-full max-w-100 mx-auto mb-5'>
           <Card.Header className='flex flex-row items-center gap-3'>
             {
               isWca ? (
-                <Image alt='WCA Logo' height={40} width={40} src='/assets/wca.svg'/>
+                <Image alt='WCA Logo' height={40} width={40} src='/assets/img/wca.svg'/>
               ) : ( 
-                <Image alt='ThailandCube Logo' height={40} width={40} src='/assets/thailandcube.svg'/>
+                <Image alt='ThailandCube Logo' height={40} width={40} src='/assets/img/thailandcube.svg'/>
               )
             }
             <Card.Title>
-              <p className='text-2xl font-bold'>{t(isWca ? 'wca' : 'non_wca')}</p>
+              <span className='text-2xl font-bold'>{t(isWca ? 'wca' : 'non_wca')}</span>
             </Card.Title>
           </Card.Header>
           <Separator/>
           <Card.Content>
             <p className='text-xl font-bold'>{competition.name.length >= 32 && competition.shortName ? competition.shortName : competition.name}</p>
             <p className='text-small text-default-500'>@{ (typeof markdownData === 'string' ? markdownData : markdownData.text) ?? competition.venue }</p>
-            <p>Date: {dateToRange(competition.startDate, competition.endDate)}</p>
+            <p>Date: <span suppressHydrationWarning>{dateToRange(competition.startDate, competition.endDate)}</span></p>
           </Card.Content>
           <Separator/>
           <Card.Footer>

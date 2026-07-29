@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '@heroui/styles';
+@import '@cubing/icons/css';
 
 :root {
   --background: oklch(0.985 0.015 225);
@@ -7,7 +8,7 @@
   --accent: oklch(37.8% 0.156 274.7);
   --accent-foreground: oklch(1 0 0);
   --danger: oklch(60.3% 0.235 27);
-  --danger-foreground: oklch(1 1 1);
+  --danger-foreground: oklch(1 0 0);
   --radius: 0.5rem;
 }
 

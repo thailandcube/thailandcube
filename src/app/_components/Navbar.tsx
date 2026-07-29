@@ -16,6 +16,7 @@ import { signIn, useSession, signOut } from 'next-auth/react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Globe, Bars, Xmark } from '@gravity-ui/icons';
 import { useEffect, useState } from 'react';
+import { getUserRole } from '../actions/users';
 // import { getUserRole } from '@/app/actions/users';
 // import { Role } from '@prisma/client';
 
@@ -47,44 +48,36 @@ export default function Navbar() {
   };
 
   const handleLoginClick = () => {
-    loginModalOverlayState.open();
+    signIn('wca');
   }
 
-  // useEffect(() => 
-  // {
-  //     if (status !== 'authenticated' || !session?.user)
-  //     {
-  //         return;
-  //     }
+  useEffect(() => {
+    if (status !== 'authenticated' || !session?.user)
+      return;
 
-  //     const fetchRoleFromDB = async () =>
-  //     {
-  //         try
-  //         {
-  //             if (session.user.id) 
-  //             {
-  //                 const role = await getUserRole(Number(session.user.id));
-  //                 setIsAdmin(role === Role.SUPERUSER || role === Role.ADMIN);
-  //                 setIsSuperuser(role === Role.SUPERUSER);
-  //             }
-  //         }
-  //         catch (error)
-  //         {
-  //             console.error('Failed to fetch role:', error);
-  //         }
-  //     }
+    const fetchRole = async () => {
+      try {
+        const role = await getUserRole(Number(session.user.id));
 
-  //     fetchRoleFromDB();
-  // }, [status, session]);
+        setIsAdmin(role === 'SUPERUSER' || role === 'ADMIN');
+        setIsSuperuser(role === 'SUPERUSER');
+      } 
+      catch (error) {
+        console.error('Failed to fetch user role:', error);
+      }
+    };
+
+    fetchRole();
+  }, [status, session]);
 
   return (
     <>
       <nav className='bg-primary text-primary-foreground mb-5 relative z-40'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between items-center h-16'>
-            <div className='flex-shrink-0 flex items-center'>
+            <div className='shrink-0 flex items-center'>
               <Link href='/' className='flex items-center'>
-                <Image src='/assets/thailandcube.svg' width={40} height={40} alt='ThailandCube'/>
+                <Image src='/assets/img/thailandcube.svg' width={40} height={40} alt='ThailandCube'/>
                 <p className='font-bold text-primary-foreground text-xl ml-4'>{t('thailandcube')}</p>
               </Link>
             </div>
@@ -94,7 +87,7 @@ export default function Navbar() {
                 <Link 
                   key={menu.href} 
                   href={`/${menu.href}`}
-                  className={`text-sm font-medium transition-colors hover:text-gray-300 ${pathname === `/${menu.href}` ? 'font-bold underline' : ''}`}
+                  className={`text-sm transition-colors hover:text-gray-300 ${pathname === `/${menu.href}` ? 'font-bold underline' : ''}`}
                 >
                   {t(menu.href)}
                 </Link>
@@ -242,27 +235,28 @@ export default function Navbar() {
 }
 
 function LoginModal({ state }: { state: ReturnType<typeof useOverlayState>}) {
-  const t = useTranslations();
+  const t = useTranslations('Header');
 
   return (
-    <Modal>
-      <Modal.Container>
-      {(onClose) => (
-        <>
-          <Modal.Header className='flex flex-col gap-1'>{t('login')}</Modal.Header>
-          <Modal.Body>
-            <Button variant='primary' onPress={() => signIn('wca')}>
-            {/* <Button as={Link} variant='primary' href='#' onPress={() => signIn('wca')}> */}
-              <Image src='/img/wca.svg' width={30} height={30} alt='WCA' />
-              {t('login_with_wca')}
-            </Button>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant='danger' onPress={() => state.close()}>{t('close')}</Button>
-          </Modal.Footer>
-        </>
-      )}
-      </Modal.Container>
+    <Modal isOpen={state.isOpen} onOpenChange={state.setOpen}>
+      <Modal.Backdrop>
+        <Modal.Container>
+        {(onClose) => (
+          <Modal.Dialog>
+            <Modal.Header className='text-lg font-medium'>{t('login')}</Modal.Header>
+            <Modal.Body className='mx-auto'>
+              <Button variant='primary' onPress={() => signIn('wca')}>
+                <Image src='/assets/wca.svg' width={30} height={30} alt='WCA' />
+                {t('login_with_wca')}
+              </Button>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant='danger' onPress={() => state.close()}>{t('close')}</Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        )}
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }
