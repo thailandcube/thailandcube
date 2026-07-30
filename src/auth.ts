@@ -5,8 +5,6 @@ import { DatabaseClient } from '@/app/lib/clients/DatabaseClient';
 import type { User } from '@/types/User';
 import { getUserRole } from './app/actions/users';
 
-// TODO: Add roles to JWT and session
-
 const refreshAccessToken = async (token: JWT): Promise<JWT> => {
   try {
     const response = await fetch(`${process.env.WCA_URL}/oauth/token`, {
