@@ -50,8 +50,6 @@ export async function getRecentNationalRecords(limit: number = 1) {
   }
 }
 
-// TODO: Add submit NR function
-
 /**
  * Update national record data
  * @param id The id of the updated national record.
