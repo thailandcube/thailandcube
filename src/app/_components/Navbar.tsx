@@ -197,16 +197,16 @@ export default function Navbar() {
                   </div>
                 </div>
 
-                <Link href='/profile' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-gray-800'>{t('dropdown.profile')}</Link>
-                <Link href='/predictions' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-gray-800'>{t('dropdown.predictions')}</Link>
+                <Link href='/profile' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-white'>{t('dropdown.profile')}</Link>
+                <Link href='/predictions' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-white'>{t('dropdown.predictions')}</Link>
                 
                 {isSuperuser && (
-                  <Link href='/new-competition' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-gray-800'>{t('dropdown.create_new_competition')}</Link>
+                  <Link href='/new-competition' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-white'>{t('dropdown.create_new_competition')}</Link>
                 )}
                 {isAdmin && (
                   <>
-                    <Link href='/admin/dashboard' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-gray-800'>{t('dropdown.admin')}</Link>
-                    <Link href='/admin/predictions' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-gray-800'>{t('dropdown.manage_predictions')}</Link>
+                    <Link href='/admin/dashboard' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-white'>{t('dropdown.admin')}</Link>
+                    <Link href='/admin/predictions' onClick={() => setIsMenuOpen(false)} className='text-lg py-2 text-white'>{t('dropdown.manage_predictions')}</Link>
                   </>
                 )}
                   

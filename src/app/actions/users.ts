@@ -8,9 +8,11 @@ const prisma = DatabaseClient.getInstance();
 const userRepository = new UserRepository(prisma);
 const userService = new UserService(userRepository);
 
-export async function getUserRole(userId: number) {
+export async function getUserRole(userId: string | number) {
   try {
-    const role = await userService.getRole(userId);
+    const parsedId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+
+    const role = await userService.getRole(parsedId);
     return role;
   } 
   catch (error) {

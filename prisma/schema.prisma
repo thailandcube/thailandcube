@@ -29,6 +29,7 @@ enum EventType {
   E333FM  @map("333fm")
   E333OH  @map("333oh")
   CLOCK   @map("clock")
+  FTO     @map("fto")
   MINX    @map("minx")
   PYRAM   @map("pyram")
   SKEWB   @map("skewb")

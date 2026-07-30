@@ -1,11 +1,10 @@
 import { PrismaClient } from '@/generated/prisma/client';
-import { DatabaseClient } from '../clients/DatabaseClient';
 
 export class UserRepository {
   private prisma: PrismaClient;
 
   constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
+    this.prisma = prisma; 
   }
 
   async getRole(userId: number) {
