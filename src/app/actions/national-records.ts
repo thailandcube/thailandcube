@@ -9,17 +9,20 @@ const prisma = DatabaseClient.getInstance();
 const nationalRecordRepository = new NationalRecordRepository(prisma);
 const nationalRecordService = new NationalRecordService(nationalRecordRepository);
 
+/**
+ * Fetches the all national records.
+ */
 export async function getAllNationalRecords() {
   try {
-    const records = await nationalRecordService.getAllNationalRecords();
+    const records = await nationalRecordService.getAll();
 
     return {
       success: true,
       data: records,
     };
   }
-  catch (err) {
-    console.error('Error in getAllNationalRecords action:', err);
+  catch (error) {
+    console.error('Error in getAllNationalRecords action:', error);
   
     return { 
       success: false, 
@@ -81,7 +84,7 @@ export async function updateNationalRecord(id: number, formData: FormData) {
 
     return { success: true, message: 'Record updated successfully' };
   }
-  catch (err) {
-    return { success: false, message: err };
+  catch (error) {
+    return { success: false, message: error };
   }
 }

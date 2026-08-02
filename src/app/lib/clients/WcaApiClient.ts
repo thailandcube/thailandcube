@@ -45,8 +45,8 @@ export class WcaApiClient {
         endDate: new Date(comp.end_date)
       }));
     }
-    catch (err) {
-      console.log('Failed to fetch WCA competitions:', err);
+    catch (error) {
+      console.error('Failed to fetch WCA competitions:', error);
       return [];
     }
   }

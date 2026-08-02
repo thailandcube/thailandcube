@@ -1,5 +1,6 @@
 import { EventType, NationalRecord, Prisma, RecordType } from '@/generated/prisma/client';
 import { NationalRecordRepository } from '../repositories/NationalRecordRepository';
+import { Service } from './Service';
 
 export interface UpdateNationalRecordDTO {
   holder: string;
@@ -13,27 +14,29 @@ export interface UpdateNationalRecordDTO {
   imageData: Prisma.NationalRecordCreateInput['imageData'];
 }
 
-export class NationalRecordService {
-  private repository: NationalRecordRepository;
-  
+export type FormattedNationalRecord = Omit<NationalRecord, 'imageData'> & { 
+  imageData: string;
+};
+
+export class NationalRecordService extends Service<NationalRecord, NationalRecordRepository, FormattedNationalRecord> {
   constructor(repository: NationalRecordRepository) {
-    this.repository = repository;
+    super(repository);
   }
 
-  async getAllNationalRecords() {
-    const records = await this.repository.getAllNationalRecords();
-    
-    return this.formatRecords(records);
+  protected format(record: NationalRecord): FormattedNationalRecord {
+    return {
+      ...record,
+      imageData: Buffer.from(record.imageData).toString('base64'),
+    };
   }
 
   async getRecentNationalRecords(limit: number = 1) {
     const records = await this.repository.getRecentNationalRecords(limit);
-
     return this.formatRecords(records);
   }
 
   async updateNationalRecord(id: number, newData: UpdateNationalRecordDTO) {
-    await this.repository.updateNationalRecords(id, newData);
+    return await this.repository.updateNationalRecords(id, newData);
   }
 
   private formatRecords(records: NationalRecord[]) {

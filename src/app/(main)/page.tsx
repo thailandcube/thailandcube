@@ -13,13 +13,13 @@ export default async function Home() {
   try {
     wcaCompetitions = await wcaApiClient.getWcaCompetitionsInThailand(); 
   }
-  catch (err) {
-    console.log('Failed to fetch WCA competitions:', err);
+  catch (error) {
+    console.error('Failed to fetch WCA competitions:', error);
   }
 
   return (
     <>
-      <div className='text-center'>
+      <div className='text-center mt-6'>
         <h1 className='text-4xl font-bold'>{t('heading')}</h1>
         <h2 className='text-3xl font-semibold'>{t('subheading')}</h2>
       </div>

@@ -55,24 +55,30 @@ export default function Navbar() {
     if (status !== 'authenticated' || !session?.user)
       return;
 
-    const fetchRole = async () => {
-      try {
-        const role = await getUserRole(Number(session.user.id));
+    const role = session.user.role;
 
-        setIsAdmin(role === 'SUPERUSER' || role === 'ADMIN');
-        setIsSuperuser(role === 'SUPERUSER');
-      } 
-      catch (error) {
-        console.error('Failed to fetch user role:', error);
-      }
-    };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsAdmin(role === 'SUPERUSER' || role === 'ADMIN');
+    setIsSuperuser(role === 'SUPERUSER');
 
-    fetchRole();
+    // const fetchRole = async () => {
+    //   try {
+    //     const role = await getUserRole(Number(session.user.id));
+
+    //     setIsAdmin(role === 'SUPERUSER' || role === 'ADMIN');
+    //     setIsSuperuser(role === 'SUPERUSER');
+    //   } 
+    //   catch (error) {
+    //     console.error('Failed to fetch user role:', error);
+    //   }
+    // };
+
+    // fetchRole();
   }, [status, session]);
 
   return (
     <>
-      <nav className='bg-primary text-primary-foreground mb-5 relative z-40'>
+      <nav className='sticky top-0 bg-primary text-primary-foreground z-50'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between items-center h-16'>
             <div className='shrink-0 flex items-center'>
@@ -229,7 +235,7 @@ export default function Navbar() {
           </div>
         )}
       </nav>
-      <LoginModal state={loginModalOverlayState}/>
+      {/* <LoginModal state={loginModalOverlayState}/> */}
     </>
   );
 }

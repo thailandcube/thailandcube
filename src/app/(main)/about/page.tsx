@@ -56,7 +56,7 @@ export default async function AboutPage() {
           return { ...staff, imageUrl: data.person.avatar.url };
         }
       } 
-      catch (err) {
+      catch (error) {
         console.error(`Failed to fetch avatar for ${staff.wcaId}`);
       }
       return staff;

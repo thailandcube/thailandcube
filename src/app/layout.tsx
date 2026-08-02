@@ -5,6 +5,7 @@ import Navbar from './_components/Navbar';
 import { Providers } from './providers';
 import { getLocale, getMessages } from 'next-intl/server';
 import Footer from './_components/Footer';
+import 'flag-icons/css/flag-icons.min.css';
 
 const prompt = Prompt({
   subsets: ['latin', 'thai'],

@@ -88,8 +88,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const data = await response.json();
         const userData = data.user as User;
         
-        console.log(data);
-
         const prisma = DatabaseClient.getInstance();
 
         try {
@@ -132,8 +130,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           return true;
         } 
-        catch (err) {
-          console.error('Error saving user to DB:', err);
+        catch (error) {
+          console.error('Error saving user to DB:', error);
           return false;
         }
       }
