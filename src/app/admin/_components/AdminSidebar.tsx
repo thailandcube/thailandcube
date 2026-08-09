@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
   Person,
-  Gear,
+  FileText,
   Magnifier,
   Cube,
   Bars,
@@ -26,11 +26,11 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: Magnifier },
   { href: '/admin/users', label: 'Users', icon: Person, superuserOnly: true },
-  { href: '/', label: 'Homepage', icon: House },
+  // { href: '/', label: 'Homepage', icon: House },
   {
-    href: '/my-teams',
-    label: 'My Teams',
-    icon: Gear,
+    href: '/captions',
+    label: 'Captions',
+    icon: FileText,
     superuserOnly: true,
   },
 ];
