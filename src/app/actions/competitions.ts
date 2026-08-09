@@ -20,3 +20,17 @@ export async function getAllCompetitions() {
     return [];
   }
 }
+
+/**
+ * Fetches all competitions in the database.
+ * @param id Competition ID of the target
+ */
+export async function getCompetitionById(id: string) {
+  try {
+    return await competitionService.getById(id);
+  }
+  catch (error) {
+    console.error(`Failed to fetch competition with an id of ${id}  in action:`, error);
+    return null;
+  }
+}

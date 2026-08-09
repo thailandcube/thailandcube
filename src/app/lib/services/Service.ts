@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Repository } from '../repositories/Repository';
 
-export abstract class Service<DbModel, Repo extends Repository<DbModel>, DtoModel = DbModel> {
+export abstract class Service<DbModel, Repo extends Repository<DbModel, any>, DtoModel = DbModel, ID = number> {
   constructor(protected repository: Repo) {}
 
   protected format(data: DbModel): DtoModel {
@@ -18,23 +19,22 @@ export abstract class Service<DbModel, Repo extends Repository<DbModel>, DtoMode
     return records.map((record) => this.format(record)); 
   }
 
-  async getById(id: number): Promise<DtoModel> {
+  async getById(id: ID): Promise<DtoModel> {
     const record = await this.repository.getById(id);
     
-    if (!record) {
+    if (!record)
       throw new Error('Resource not found'); 
-    }
     
     return this.format(record);
   }
 
-  async update<UpdateInput = Partial<DbModel>>(id: number, data: UpdateInput): Promise<DtoModel> {
+  async update<UpdateInput = Partial<DbModel>>(id: ID, data: UpdateInput): Promise<DtoModel> {
     const updatedRecord = await this.repository.update(id, data);
     
     return this.format(updatedRecord);
   }
 
-  async delete(id: number): Promise<DtoModel> {
+  async delete(id: ID): Promise<DtoModel> {
     const deletedRecord = await this.repository.delete(id);
 
     return this.format(deletedRecord);

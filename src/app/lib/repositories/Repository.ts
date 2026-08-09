@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-export abstract class Repository<T> {
+export abstract class Repository<T, ID = number> {
   constructor(protected modelDelegate: any) {}
 
   async create<CreateInput = Partial<T>>(data: CreateInput): Promise<T> {
@@ -13,7 +13,7 @@ export abstract class Repository<T> {
     return await this.modelDelegate.findMany();
   }
 
-  async getById(id: number): Promise<T | null> {
+  async getById(id: ID): Promise<T | null> {
     return await this.modelDelegate.findUnique({
       where: {
         id,
@@ -21,7 +21,7 @@ export abstract class Repository<T> {
     });
   }
 
-  async update<UpdateInput = Partial<T>>(id: number, data: UpdateInput): Promise<T> {
+  async update<UpdateInput = Partial<T>>(id: ID, data: UpdateInput): Promise<T> {
     return await this.modelDelegate.update({
       where: {
         id,
@@ -30,7 +30,7 @@ export abstract class Repository<T> {
     });
   }
 
-  async delete(id: number): Promise<T> {
+  async delete(id: ID): Promise<T> {
     return await this.modelDelegate.delete({
       where: { 
         id,

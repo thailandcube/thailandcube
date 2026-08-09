@@ -1,4 +1,8 @@
 {
+  "Global": {
+    "event": "Event",
+    "select_event": "Select an event"
+  },
   "Header": {
     "thailandcube": "ThailandCube",
     "home": "Home",
@@ -96,7 +100,10 @@
     "region": "Region",
     "average": "Average",
     "best": "Best",
-    "no_results": "No Results"
+    "no_results": {
+      "header": "No results available yet",
+      "description": "Scores for this round have not been published. Please check back after the round concludes"
+    }
   },
   "CompetitionInfo": {
     "non_wca": "Non-WCA Competition",
@@ -108,7 +115,9 @@
     "download_certificates": "Download Certificates",
     "view_results": "View Results",
     "view_tournament": "View Tournament",
-    "round_not_open": "Round Not Open"
+    "round_not_open": "Round Not Open",
+    "click_to_view_tournament": "Click here to view tournament results",
+    "select_event_to_view_results": "Please select an event to view results"
   },
   "CompetitionSchedule":
   {

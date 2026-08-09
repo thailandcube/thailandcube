@@ -6,6 +6,23 @@ export class ResultRepository extends Repository<Result> {
     super(prisma.result);
   }
 
+  async getResultsInRound(roundId: number) {
+    return await this.modelDelegate.findMany({
+      where: {
+        round: {
+          id: roundId,
+        }
+      },
+      include: {
+        competitor: true
+      },
+      orderBy: [
+        { result: 'asc' },
+        { best: 'asc' }
+      ] 
+    });
+  }
+
   async deleteCompetitorResult(competitorId: number, competitionId: string) {
     return await this.modelDelegate.deleteMany({
       where: {

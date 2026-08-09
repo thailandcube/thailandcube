@@ -7,6 +7,10 @@ export class ResultService extends Service<Result, ResultRepository> {
     super(repository);
   }
 
+  async getResultsInRound(roundId: number) {
+    return await this.repository.getResultsInRound(roundId);
+  }
+
   async deleteCompetitorResult(competitorId: number, competitionId: string) {
     const deletedResult = await this.repository.deleteCompetitorResult(competitorId, competitionId);
 
