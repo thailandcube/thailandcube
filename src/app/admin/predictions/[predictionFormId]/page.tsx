@@ -1,4 +1,4 @@
-import { getPredictionFormDataById } from '@/app/actions/predictions';
+import { getPredictionFormById } from '@/app/actions/predictions';
 import { notFound } from 'next/navigation';
 import AdminPredictionDashboard from './_components/AdminPredictionDashboard';
 
@@ -6,7 +6,7 @@ export default async function AdminPredictionViewPage({ params }: { params: Prom
   const resolvedParams = await params;
   const formId = resolvedParams.predictionFormId;
 
-  const form = await getPredictionFormDataById(formId, true);
+  const form = await getPredictionFormById(formId, true);
 
   if (!form.success)
     notFound();

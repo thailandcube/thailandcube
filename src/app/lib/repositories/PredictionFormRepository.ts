@@ -71,4 +71,31 @@ export class PredictionFormRepository extends Repository<PredictionForm, string>
       });
     }
   }
+
+  async getLeaderboardById(id: string) {
+    return await this.modelDelegate.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        submissions: {
+          orderBy: {
+            score: 'desc',
+          },
+          include: {
+            user: {
+              include: {
+                competitor: true,
+              },
+            },
+            predictions: {
+              include: {
+                predictedCuber: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }

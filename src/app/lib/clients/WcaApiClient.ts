@@ -50,4 +50,19 @@ export class WcaApiClient {
       return [];
     }
   }
+
+  async getWcifByCompetitionId(competitionId: string) {
+    try {
+      const response = await fetch(`${process.env.WCA_URL}/api/v0/competitions/${competitionId}/wcif/public`);
+
+      if (!response.ok)
+        throw new Error(`HTTP error! Status: ${response.status}`);
+
+      return await response.json();
+    }
+    catch (error) {
+      console.error('Failed to fetch WCA competitions:', error);
+      return {};
+    }
+  }
 }

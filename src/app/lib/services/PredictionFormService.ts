@@ -65,4 +65,8 @@ export class PredictionFormService extends Service<PredictionForm, PredictionFor
 
     return record;
   }
+
+  async getLeaderboardById(id: string) {
+    return await this.repository.getLeaderboardById(id);
+  }
 }

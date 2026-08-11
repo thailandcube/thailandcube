@@ -2,7 +2,7 @@
 'use server';
 
 import { PredictionForm } from '@/generated/prisma/client';
-import { predictionAnswerService, predictionFormService } from '../lib/services/instances';
+import { predictionAnswerService, predictionFormService, predictionSubmissionService } from '../lib/services/instances';
 import { CuberData } from '@/types/predictions/CuberData';
 import { AdminPredictionFormDTO, PublicPredictionFormDTO } from '../lib/dtos/AdminPredictionFormDTO';
 import { PredictionAnswer, Prisma } from '@/generated/prisma';
@@ -110,10 +110,22 @@ export async function getAllPredictionForms() {
   }
 }
 
-export async function getPredictionFormDataById(id: string, adminMode: true): Promise<{ success: true; data: AdminPredictionFormDTO } | { success: false; error: string }>;
-export async function getPredictionFormDataById(id: string, adminMode?: false): Promise<{ success: true; data: PublicPredictionFormDTO } | { success: false; error: string }>;
+export async function getUserExistingSubmission(userId: number, formId: string) {
+  try {
+    const submission = await predictionSubmissionService.getByUserIdFormId(userId, formId);
 
-export async function getPredictionFormDataById(id: string, adminMode: boolean = false) {
+    return { success: true, data: submission };
+  }
+  catch (error: any) {
+    console.error(error.message);
+    return { success: false, error: error.message || 'An unexpected error occurred' };
+  }
+}
+
+export async function getPredictionFormById(id: string, adminMode: true): Promise<{ success: true; data: AdminPredictionFormDTO } | { success: false; error: string }>;
+export async function getPredictionFormById(id: string, adminMode?: false): Promise<{ success: true; data: PublicPredictionFormDTO } | { success: false; error: string }>;
+
+export async function getPredictionFormById(id: string, adminMode: boolean = false) {
   try {
     const data = adminMode 
       ? await predictionFormService.getById(id, true)
@@ -122,8 +134,80 @@ export async function getPredictionFormDataById(id: string, adminMode: boolean =
     return { success: true, data };
   }
   catch (error: any) {
-    console.error('Failed to get forms with an ID of:', id);
+    console.error(error.message);
     return { success: false, error: error.message || 'An unexpected error occurred' };
+  }
+}
+
+export async function getPredictionFormLeaderboardById(id: string) {
+  try {
+    const data = await predictionFormService.getLeaderboardById(id);
+
+    return { success: true, data };
+  }
+  catch (error: any) {
+    console.error(error.message);
+    return { success: false, error: error.message || 'An unexpected error occurred' };
+  }
+}
+
+export async function submitPrediction({ predictionFormId, userId, wcaId, wantPrize, predictions }: { predictionFormId: string, userId: number, wcaId: string | null, wantPrize: boolean, predictions: any[] }) {
+  try {
+    if (!predictionFormId || !userId || !predictions || !Array.isArray(predictions))
+      throw new Error('Missing required fields');
+
+    const response = await getPredictionFormById(predictionFormId);
+
+    if (!response.success)
+      throw new Error('Failed while getting prediction form');
+    if (!response.data)
+      throw new Error('Prediction form not found');
+
+    const form = response.data;
+
+    if (new Date() > form.closeTime || form.isLocked)
+      throw new Error('Submissions are strictly closed for this competition.');
+
+    const flatPredictions = [];
+
+    for (const pred of predictions) {
+      if (pred.championId) {
+        flatPredictions.push({
+          event: pred.event,
+          placement: 'CHAMPION',
+          predictedCuberId: pred.championId,
+        });
+      }
+      if (pred.firstRunnerUpId) {
+        flatPredictions.push({
+          event: pred.event,
+          placement: 'FIRST_RUNNER_UP',
+          predictedCuberId: pred.firstRunnerUpId,
+        });
+      }
+      if (pred.secondRunnerUpId) {
+        flatPredictions.push({
+          event: pred.event,
+          placement: 'SECOND_RUNNER_UP',
+          predictedCuberId: pred.secondRunnerUpId,
+        });
+      }
+    }
+
+    const processedSubmission = await predictionSubmissionService.upsertSubmission(
+      predictionFormId,
+      userId,
+      wcaId,
+      wantPrize,
+      flatPredictions
+    );
+
+    return { success: true, submissionId: processedSubmission.id };
+  }
+  catch (error: any) {
+    console.error(error.message);
+    return { success: false, error: error.message || 'An unexpected error occurred' };
+
   }
 }
 
