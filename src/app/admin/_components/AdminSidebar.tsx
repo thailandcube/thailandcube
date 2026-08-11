@@ -10,6 +10,7 @@ import {
   Xmark,
   House,
   ArrowRightFromSquare,
+  ChartBar,
 } from '@gravity-ui/icons';
 import { Avatar } from '@heroui/react';
 import { signOut, useSession } from 'next-auth/react';
@@ -26,7 +27,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: Magnifier },
   { href: '/admin/users', label: 'Users', icon: Person, superuserOnly: true },
-  // { href: '/', label: 'Homepage', icon: House },
+  { href: '/admin/predictions', label: 'Predictions', icon: ChartBar },
   {
     href: '/captions',
     label: 'Captions',

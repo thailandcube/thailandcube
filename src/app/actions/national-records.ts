@@ -1,13 +1,7 @@
 'use server';
 
 import { EventType, RecordType } from '@/generated/prisma/enums';
-import { DatabaseClient } from '../lib/clients/DatabaseClient';
-import { NationalRecordRepository } from '../lib/repositories/NationalRecordRepository';
-import { NationalRecordService } from '../lib/services/NationalRecordService';
-
-const prisma = DatabaseClient.getInstance();
-const nationalRecordRepository = new NationalRecordRepository(prisma);
-const nationalRecordService = new NationalRecordService(nationalRecordRepository);
+import { nationalRecordService } from '../lib/services/instances';
 
 /**
  * Fetches the all national records.

@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
-import { DatabaseClient } from '../lib/clients/DatabaseClient';
-import { ResultRepository } from '../lib/repositories/ResultRepository';
-import { ResultService } from '../lib/services/ResultService';
-
-const prisma = DatabaseClient.getInstance();
-const resultRepository = new ResultRepository(prisma);
-const resultService = new ResultService(resultRepository);
+import { resultService } from '../lib/services/instances';
 
 export async function getResultsInRound(roundId: number) {
   try {

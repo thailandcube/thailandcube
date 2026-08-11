@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -213,7 +213,6 @@ model PredictionForm {
   id            String               @id @unique @map("competition_id") 
   name          String               
   
-  // Replace isActive with these two lines:
   openTime      DateTime             @map("open_time")
   closeTime     DateTime             @map("close_time")
 
@@ -303,7 +302,6 @@ model PredictionAnswer {
   event            EventType
   placement        Placement
   
-  // We link to the specific cuber from the psych sheet that won
   actualCuberId    Int            @map("actual_cuber_id")
   actualCuber      PredictionEventCompetitor @relation(fields: [actualCuberId], references: [id])
 

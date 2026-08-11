@@ -1,12 +1,6 @@
 'use server';
 
-import { DatabaseClient } from '../lib/clients/DatabaseClient';
-import { CompetitionRepository } from '../lib/repositories/CompetitionRepository';
-import { CompetitionService } from '../lib/services/CompetitionService';
-
-const prisma = DatabaseClient.getInstance();
-const competitionRepository = new CompetitionRepository(prisma);
-const competitionService = new CompetitionService(competitionRepository);
+import { competitionService } from '../lib/services/instances';
 
 /**
  * Fetches all competitions in the database.

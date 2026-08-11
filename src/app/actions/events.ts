@@ -1,12 +1,7 @@
 'use server';
 
-import { DatabaseClient } from '../lib/clients/DatabaseClient';
-import { EventOptions, EventRepository } from '../lib/repositories/EventRepository';
-import { EventService } from '../lib/services/EventService';
-
-const prisma = DatabaseClient.getInstance();
-const eventRepository = new EventRepository(prisma);
-const eventService = new EventService(eventRepository);
+import { EventOptions } from '../lib/repositories/EventRepository';
+import { eventService } from '../lib/services/instances';
 
 /**
  * Fetches all events in the targetted competition

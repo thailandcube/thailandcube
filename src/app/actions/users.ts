@@ -1,15 +1,9 @@
 'use server';
 
 import { Role } from '@/generated/prisma/enums';
-import { DatabaseClient } from '../lib/clients/DatabaseClient';
-import { UserRepository } from '../lib/repositories/UserRepository';
-import { UserService } from '../lib/services/UserService';
 import { PermissionError } from '../lib/errors/PermissionError';
+import { userService } from '../lib/services/instances';
 import { auth } from '@/auth';
-
-const prisma = DatabaseClient.getInstance();
-const userRepository = new UserRepository(prisma);
-const userService = new UserService(userRepository);
 
 /**
  * Fetches user's role by their WCA account ID (not WCA ID).
