@@ -29,7 +29,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/users', label: 'Users', icon: Person, superuserOnly: true },
   { href: '/admin/predictions', label: 'Predictions', icon: ChartBar },
   {
-    href: '/captions',
+    href: '/admin/captions',
     label: 'Captions',
     icon: FileText,
     superuserOnly: true,
