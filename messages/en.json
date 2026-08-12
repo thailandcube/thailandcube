@@ -26,13 +26,13 @@
   },
   "Footer": {
     "thailandcube": "ThailandCube",
-    "subtitle": "Thailand's biggest speed cubing community",
+    "subtitle": "Thailand's biggest speedcubing community",
     "contact_us": "Contact Us",
     "forms_text": "Or contact us via"
   },
   "HomePage": {
     "heading": "Welcome to ThailandCube",
-    "subheading": "Thailand's biggest speed cubing community",
+    "subheading": "Thailand's biggest speedcubing community",
     "our_activities": "Our Activities",
     "wca_competitions": "WCA Competitions in Thailand"
   },
@@ -129,10 +129,97 @@
     "ranking": "Proceeding"
   },
   "Predictions": {
-    "forms": {
+    "title": "Predictions",
+    "subtitle": "Test your psych sheet knowledge and predict the podiums for upcoming WCA competitions.",
+    "no_predictions": "No predictions are currently available.",
+    "open": "OPEN AT",
+    "close": "CLOSE AT",
+    "play": "Play Now",
+    "view": "View Details",
+    "leaderboard": "Leaderboard",
+    "thai_cuber_names_only": "TH Cuber Names Only",
+    "status": {
+      "upcoming": "Upcoming",
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "Forms": {
+      "status": {
+        "open": "Open",
+        "closed": "Closed"
+      },
+      "modal": {
+        "auth_required": "Authentication Required",
+        "must_login": "You must be logged in to participate in the prediction game.",
+        "login_with_wca": "Log In with WCA"
+      },
       "wait": {
-        "title": "Hold your horses! 🐎",
-        "subtitle": "Submissions for Pathum Thani Mini 2026 Predictions open on 6/1/2026, 11:30:00 AM."
+        "title": "Hold your horses!",
+        "subtitle": "Submissions for {formName} Predictions open on {openDateTime}."
+      },
+      "close": {
+        "title": "Submissions Closed",
+        "subtitle": "We are no longer accepting predictions for {formName}."
+      },
+      "open": {
+        "closes_on": "Closes on",
+        "thai_cuber_names_only": "Thai Nationals Edition (TH Cubers Only)",
+        "update":{
+          "title": "Update Your Predictions",
+          "subtitle": "You have already submitted, but the form is still open. You may update your predictions until the deadline."
+        },
+        "rules": {
+          "title": "Prediction Rules",
+          "one_entry": "You may only submit your predictions once per competition.",
+          "editing": "You may edit your predictions as many times as you like before the deadline.",
+          "finality": "Once the deadline passes or the form is locked, predictions cannot be edited.",
+          "scoring": "Points are awarded for correctly predicting the exact placement of competitors.",
+          "duplicates": "You cannot select the same competitor for multiple placements within a single event.",
+          "prizes": "Only predictors who compete in the competition is eligible for the prize. In order to confirm receiving the prize, you must check the prize consent box below."
+        },
+        "forms": {
+          "information": "Your Information",
+          "predictor_name": "Predictor Name",
+          "wish_prize": "I wish to receive a prize if I am eligible.",
+          "event_predictions": "{event} Predictions",
+          "champion": "Champion (1st Place)",
+          "first_runner_up": "First Runner Up (2nd Place)",
+          "second_runner_up": "Second Runner Up (3rd Place)",
+          "select_cuber": "Select a cuber",
+          "search": "Search...",
+          "no_results_found": "No results found.",
+          "already_selected": "Competitor is already selected in this event.",
+          "confirm": "I confirm my predictions are valid and accept the rules stated above.",
+          "submit": "Submit Predictions",
+          "update": "Update Predictions",
+          "read_only": "Prediction Locked In",
+          "fix_errors": "Fix Errors to Submit"
+        }
+      },
+      "toast": {
+        "has_duplicates": "Please fix the duplicate selections before submitting.",
+        "accept_terms": "You must accept the terms to submit.",
+        "not_logged_in": "You must be logged in to submit.",
+        "submission_failed": "Submission failed",
+        "update_success": "Prediction updated successfully!",
+        "submit_success": "Prediction submitted successfully!"
+      }
+    },
+    "Leaderboard": {
+      "title": "{formName} Predictions Leaderboards",
+      "subtitle": "View all submitted predictions and current scores for this competition.",
+      "entry_count": "{count, plural, =0 {No Entries} =1 {# Entry} other {# Entries}}",
+      "table": {
+        "rank": "RANK",
+        "player": "PLAYER",
+        "score": "SCORE",
+        "submitted_at": "SUBMITTED AT",
+        "view_picks": "View Picks",
+        "no_submissions": "No submissions yet."
+      },
+      "modal": {
+        "title": "{name}'s Picks",
+        "subtitle": "Total Score: {score, plural, =1 {# pt} other {# pts}}"
       }
     }
   }

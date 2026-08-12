@@ -23,7 +23,7 @@ export default async function PredictionFormPage({ params }: { params: Promise<{
   if (userId)
     existingSubmissionResponse = await getUserExistingSubmission(userId, formData.id);
 
-  if (!existingSubmissionResponse?.success)
+  if (existingSubmissionResponse?.success)
     existingSubmission = existingSubmissionResponse?.data;
 
   return (

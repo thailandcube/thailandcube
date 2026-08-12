@@ -13,6 +13,7 @@ import { Competitor, PredictionEventCompetitor, PredictionForm, PredictionRecord
 import { useMemo, useState } from 'react';
 import { extractLatinName } from '@/app/utils/ExtractLatinName';
 import { EventCodeToFullMap } from '@/app/utils/EnumMapper';
+import { useLocale, useTranslations } from 'next-intl';
 
 type UserWithCompetitor = User & {
   competitor: Competitor | null;
@@ -32,13 +33,25 @@ interface Props {
   submissions: SubmissionWithPredictions[];
 }
 
-const PlacementMap: Record<string, string> = {
-  'CHAMPION': 'Champion (1st)',
-  'FIRST_RUNNER_UP': 'Runner Up (2nd)',
-  'SECOND_RUNNER_UP': 'Second Runner Up (3rd)'
+const PlacementMap: Record<string, Record<string, string>> = {
+  'CHAMPION': {
+    'en': 'Champion (1st Place)',
+    'th': 'ชนะเลิศ',
+  },
+  'FIRST_RUNNER_UP': {
+    'en': 'First Runner Up (2nd Place)',
+    'th': 'รองชนะเลิศอันดับที่ 1',
+  },
+  'SECOND_RUNNER_UP': {
+    'en': 'Second Runner Up (3rd Place)',
+    'th': 'รองชนะเลิศอันดับที่ 2',
+  }
 };
 
 export default function PredictionLeaderboard({ form, submissions }: Props) {
+  const t = useTranslations('Predictions.Leaderboard');
+  const locale = useLocale();
+
   const state = useOverlayState();
   const [selectedSubmission, setSelectedSubmission] = useState<SubmissionWithPredictions | null>(null);
 
@@ -86,11 +99,11 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
       <Card>
         <Card.Header className='flex flex-col items-start px-6 pt-6 pb-4'>
           <div className='flex justify-between w-full items-center'>
-            <h1 className='text-2xl font-bold'>{form.name} Leaderboards</h1>
-            <Chip color='accent' variant='soft'>{submissions.length} Entries</Chip>
+            <h1 className='text-2xl font-bold'>{t('title', {formName: form.name})}</h1>
+            <Chip color='accent' variant='soft'>{t('entry_count', {count: submissions.length})}</Chip>
           </div>
           <p className='text-default-500 text-sm mt-1'>
-            View all submitted predictions and current scores for this competition.
+            {t('subtitle')}
           </p>
         </Card.Header>
         <Separator/>
@@ -99,14 +112,14 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
             <Table.ScrollContainer>
               <Table.Content aria-label='Submission leaderboard table'>
                 <Table.Header>
-                  <Table.Column isRowHeader>RANK</Table.Column>
-                  <Table.Column>PLAYER</Table.Column>
+                  <Table.Column isRowHeader>{t('table.rank')}</Table.Column>
+                  <Table.Column>{t('table.player')}</Table.Column>
                   <Table.Column>WCA ID</Table.Column>
-                  <Table.Column>SCORE</Table.Column>
-                  <Table.Column>SUBMITTED AT</Table.Column>
-                  <Table.Column>ACTIONS</Table.Column>
+                  <Table.Column>{t('table.score')}</Table.Column>
+                  <Table.Column>{t('table.submitted_at')}</Table.Column>
+                  <Table.Column></Table.Column>
                 </Table.Header>
-                <Table.Body renderEmptyState={() => <p className='text-2xl font-semibold text-center mx-auto'>No submissions yet.</p>}>
+                <Table.Body renderEmptyState={() => <p className='text-2xl font-semibold text-center mx-auto'>{t('table.no_submissions')}</p>}>
                   {submissions.map((sub, index) => (
                     <Table.Row key={sub.id}>
                       <Table.Cell>
@@ -140,7 +153,7 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
                           variant='primary' 
                           onPress={() => handleViewPredictions(sub)}
                         >
-                          View Picks
+                          {t('table.view_picks')}
                         </Button>
                       </Table.Cell>
                     </Table.Row>
@@ -159,10 +172,10 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
               <Modal.CloseTrigger/>
               <Modal.Header>
                 <span className='text-lg font-bold'>
-                  {selectedSubmission ? `${getPredictorName(selectedSubmission)}'s Picks` : 'Player Predictions'}
+                  {t('modal.title', {name: selectedSubmission ? getPredictorName(selectedSubmission) : 'Player'})}
                 </span>
                 <span className='text-xs font-normal text-default-400'>
-                  Form: {form.name} | Total Score: {selectedSubmission?.score} pts
+                  {t('modal.subtitle', {score: selectedSubmission?.score ?? 0})}
                 </span>
               </Modal.Header>
               <Modal.Body className='py-4'>
@@ -170,10 +183,9 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
                   {Object.entries(groupedModalPredictions).map(([eventCode, records]) => {
                     const eventName = EventCodeToFullMap[eventCode as keyof typeof EventCodeToFullMap] || eventCode;
                     
-                    const sortedRecords = [...records].sort((a, b) => 
-                    {
-                        const order = ['CHAMPION', 'FIRST_RUNNER_UP', 'SECOND_RUNNER_UP'];
-                        return order.indexOf(a.placement) - order.indexOf(b.placement);
+                    const sortedRecords = [...records].sort((a, b) => {
+                      const order = ['CHAMPION', 'FIRST_RUNNER_UP', 'SECOND_RUNNER_UP'];
+                      return order.indexOf(a.placement) - order.indexOf(b.placement);
                     });
 
                     return (
@@ -189,7 +201,7 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
                             >
                               <div>
                                 <span className='text-xs font-semibold opacity-70 block'>
-                                  {PlacementMap[record.placement]}
+                                  {PlacementMap[record.placement][locale]}
                                 </span>
                                 <span className='font-medium'>
                                   {extractLatinName(record.predictedCuber.name)}

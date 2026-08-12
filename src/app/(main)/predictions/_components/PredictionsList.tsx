@@ -3,22 +3,24 @@
 import {
   Card,
   Chip,
-  Button,
   Separator,
   buttonVariants,
   Link,
 } from '@heroui/react';
 import { PredictionForm } from '@/generated/prisma/client';
+import { useTranslations } from 'next-intl';
 
 export default function PredictionsList({ forms }: { forms: PredictionForm[] }) {
+  const t = useTranslations('Predictions');
+
   const now = new Date();
 
   return (
     <>
       <div className='mb-8'>
-        <h1 className='text-3xl font-bold'>Predictions</h1>
+        <h1 className='text-3xl font-bold'>{t('title')}</h1>
         <p className='text-default-500 mt-2'>
-          Test your psych sheet knowledge and predict the podiums for upcoming WCA competitions.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -26,7 +28,7 @@ export default function PredictionsList({ forms }: { forms: PredictionForm[] }) 
         (
           <Card className='text-center py-12'>
             <Card.Content>
-                <p className='text-default-500'>No prediction games are currently available.</p>
+                <p className='text-default-500'>{t('no_predictions')}</p>
             </Card.Content>
           </Card>
         ) : (
@@ -42,11 +44,11 @@ export default function PredictionsList({ forms }: { forms: PredictionForm[] }) 
               let statusChip;
               
               if (isUpcoming) 
-                statusChip = <Chip color='warning' variant='soft' size='sm'>Upcoming</Chip>;
+                statusChip = <Chip color='warning' variant='soft' size='sm'>{t('status.upcoming')}</Chip>;
               else if (isActive) 
-                statusChip = <Chip color='success' variant='soft' size='sm'>Open</Chip>;
+                statusChip = <Chip color='success' variant='soft' size='sm'>{t('status.open')}</Chip>;
               else 
-                statusChip = <Chip color='danger' variant='soft' size='sm'>Closed</Chip>;
+                statusChip = <Chip color='danger' variant='soft' size='sm'>{t('status.closed')}</Chip>;
 
               return (
                 <Card key={form.id} className='flex flex-col h-full'>
@@ -57,19 +59,19 @@ export default function PredictionsList({ forms }: { forms: PredictionForm[] }) 
                     </div>
                     {form.isThaiOnly && (
                       <Chip variant='primary' size='sm'>
-                        TH Cuber Names Only
+                        {t('thai_cuber_names_only')}
                       </Chip>
                     )}
                   </Card.Header>
                   
-                  <Card.Content className='px-6 py-4 flex-grow'>
+                  <Card.Content className='px-6 py-4 grow'>
                     <div className='flex flex-col gap-3 text-sm'>
                       <div>
-                        <span className='text-default-500 text-xs font-semibold tracking-wider'>OPENS</span>
+                        <span className='text-default-500 text-xs font-semibold tracking-wider'>{t('open')}</span>
                         <p className='font-medium'>{openTime.toLocaleString()}</p>
                       </div>
                       <div>
-                        <span className='text-default-500 text-xs font-semibold tracking-wider'>CLOSES</span>
+                        <span className='text-default-500 text-xs font-semibold tracking-wider'>{t('close')}</span>
                         <p className='font-medium'>{closeTime.toLocaleString()}</p>
                       </div>
                     </div>
@@ -83,13 +85,13 @@ export default function PredictionsList({ forms }: { forms: PredictionForm[] }) 
                         href={`/predictions/${form.id}`}
                         className={`${buttonVariants({variant: 'primary'})} w-full font-semibold`}
                       >
-                        {isActive ? 'Play Now' : 'View Details'}
+                        {t(isActive ? 'play' : 'view')}
                       </Link>
                       <Link
                         href={`/predictions/${form.id}/leaderboard`}
                         className={`${buttonVariants({variant: 'primary'})} w-full font-semibold`}
                       >
-                        Leaderboard
+                        {t('leaderboard')}
                       </Link>
                     </div>
                   </Card.Footer>

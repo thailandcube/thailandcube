@@ -5,6 +5,7 @@ import { EventCodeToFullMap } from '@/app/utils/EnumMapper';
 import type { PredictionEventCompetitor, PredictionForm, PredictionRecord, PredictionSubmission } from '@/generated/prisma/client';
 import { Autocomplete, Button, Card, Checkbox, Chip, EmptyState, ErrorMessage, Form, Input, Label, ListBox, Modal, SearchField, Separator, toast, useFilter } from '@heroui/react';
 import { signIn, useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useMemo, useState } from 'react';
 
 type SubmissionWithRecords = PredictionSubmission & {
@@ -19,6 +20,8 @@ interface Props {
 
 export default function PredictionForm({ form, roster, existingSubmission }: Props) {
   const { data: session, status } = useSession();
+
+  const t = useTranslations('Predictions.Forms');
 
   const isSubmitted = !!existingSubmission;
 
@@ -106,17 +109,17 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
     e.preventDefault();
     
     if (hasAnyDuplicates){
-      alert('Please fix the duplicate selections before submitting.');
+      toast.danger(t('toast.has_duplicates'));
       return;
     }
 
     if (!termsAccepted) {
-      alert('You must accept the terms to submit.');
+      toast.danger(t('toast.accept_terms'));
       return;
     }
 
     if (!session?.user?.id) {
-      alert('You must be logged in to submit.');
+      toast.danger(t('toast.not_logged_in'));
       return;
     }
 
@@ -148,16 +151,14 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
         predictions: predictionsPayload
       };
 
-      // console.log('Submitting Payload:', payload);
-
       const response = await submitPrediction(payload);
       
       if (!response.success) {
-        toast.danger('Submission failed');
+        toast.danger(t('toast.submission_failed'));
         throw new Error('Submission failed');
       }
       
-      toast.success(isSubmitted ? 'Prediction updated successfully!' : 'Prediction submitted successfully!');
+      toast.success(t(`toast.${isSubmitted ? 'update' : 'submit'}_success`));
       window.location.reload(); 
     } 
     catch (error) {
@@ -173,13 +174,13 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
       <Modal.Backdrop isOpen={status === 'unauthenticated'}>
         <Modal.Container>
           <Modal.Dialog aria-label='Login'>
-            <Modal.Header className='flex flex-col gap-1'>Authentication Required</Modal.Header>
+            <Modal.Header className='flex flex-col gap-1'>{t('modal.auth_required')}</Modal.Header>
             <Modal.Body>
-              <p>You must be logged in to participate in the prediction game.</p>
+              <p>{t('modal.must_login')}</p>
             </Modal.Body>
             <Modal.Footer>
               <Button variant='primary' onPress={() => signIn('wca')}>
-                Log In with WCA
+                {t('modal.login_with_wca')}
               </Button>
             </Modal.Footer>
           </Modal.Dialog>
@@ -187,6 +188,20 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
       </Modal.Backdrop>
     </Modal>
   );
+
+  useEffect(() => {
+    if (!existingSubmission) return;
+
+    const newPredictions: Record<string, number> = {};
+    existingSubmission.predictions.forEach(p => {
+      newPredictions[`${p.event}_${p.placement}`] = p.predictedCuberId;
+    });
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPredictions(newPredictions);
+    setWantPrize(existingSubmission.wantsPrize);
+    setTermsAccepted(true);
+  }, [existingSubmission]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -214,9 +229,9 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
         {loginModal}
         <Card className='text-center py-12'>
           <Card.Content>
-            <h2 className='text-2xl font-bold'>Hold your horses! 🐎</h2>
+            <h2 className='text-2xl font-bold'>{t('wait.title')}</h2>
             <p className='text-center text-default-500 mt-2'>
-              Submissions for {form.name} open on {openTime.toLocaleString()}.
+              {t('wait.subtitle', {formName: form.name, openDateTime: openTime.toLocaleString()})}
             </p>
           </Card.Content>
         </Card>
@@ -230,11 +245,12 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
         {loginModal}
         <Card className='text-center py-12'>
           <Card.Content>
-            <h2 className='text-2xl font-bold'>Submissions Closed 🔒</h2>
+            <h2 className='text-2xl font-bold'>{t('close.title')}</h2>
             <p className='text-center text-default-500 mt-2'>
-              {form.isLocked 
+              {t('close.subtitle')}
+              {/* {form.isLocked 
                 ? `Submissions for ${form.name} have been locked by an admin.` 
-                : `We are no longer accepting predictions for ${form.name}.`}
+                : `We are no longer accepting predictions for ${form.name}.`} */}
             </p>
           </Card.Content>
         </Card>
@@ -254,11 +270,11 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
             </Chip>
           </div>
           <p className='text-default-500 text-sm mt-1'>
-            Closes on {closeTime.toLocaleString()}
+            {t('open.closes_on')} {closeTime.toLocaleString()}
           </p>
           {form.isThaiOnly && (
             <Chip color='accent' variant='soft' size='sm' className='mt-2'>
-              Thai Nationals Edition (TH Cubers Only)
+              {t('open.thai_cuber_names_only')}
             </Chip>
           )}
         </Card.Header>
@@ -275,30 +291,30 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
               </div>
             ) : isSubmitted ? (
               <div className='bg-warning-50 p-5 rounded-lg mb-8 flex flex-col gap-2 border border-warning-200'>
-                <h2 className='text-lg font-bold text-warning-800'>✏️ Update Your Predictions</h2>
+                <h2 className='text-lg font-bold text-warning-800'>{t('open.update.title')}</h2>
                 <p className='text-sm text-warning-700'>
-                  You have already submitted, but the form is still open. You may update your predictions until the deadline.
+                  {t('open.update.subtitle')}
                 </p>
               </div>
             ) : null
           }
 
           <div className='bg-default-100 p-5 rounded-lg mb-8 flex flex-col gap-3'>
-            <h2 className='text-lg font-bold text-default-800'>📜 Prediction Rules</h2>
+            <h2 className='text-lg font-bold text-default-800'>{t('open.rules.title')}</h2>
             <ul className='list-disc list-inside text-sm text-default-600 flex flex-col gap-2'>
-              <li><strong>One Entry:</strong> You may only submit your predictions once per competition.</li>
-              <li><strong>Editing:</strong> You may edit your predictions as many times as you like before the deadline.</li>
-              <li><strong>Finality:</strong> Once the deadline passes or the form is locked, predictions cannot be edited.</li>
-              <li><strong>Scoring:</strong> Points are awarded for correctly predicting the exact placement of competitors.</li>
-              <li><strong>Duplicates:</strong> You cannot select the same competitor for multiple placements within a single event.</li>
-              <li><strong>Prizes:</strong> To be eligible for prizes (if applicable), you must check the prize consent box below.</li>
+              <li>{t('open.rules.one_entry')}</li>
+              <li>{t('open.rules.editing')}</li>
+              <li>{t('open.rules.finality')}</li>
+              <li>{t('open.rules.scoring')}</li>
+              <li>{t('open.rules.duplicates')}</li>
+              <li>{t('open.rules.prizes')}</li>
             </ul>
           </div>
 
           <Form onSubmit={handleSubmit} className='flex flex-col gap-8'>
             <div className='flex flex-col gap-4'>
-              <h2 className='text-lg font-semibold'>Your Information</h2>
-              <Label>Predictor Name</Label>
+              <h2 className='text-lg font-semibold'>{t('open.forms.information')}</h2>
+              <Label>{t('open.forms.predictor_name')}</Label>
               <Input 
                 required
                 type='text' 
@@ -318,12 +334,13 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                 isSelected={wantPrize} 
                 onChange={setWantPrize}
                 isDisabled={isReadOnly}
+                variant='secondary'
               >
                 <Checkbox.Content>
                   <Checkbox.Control>
                     <Checkbox.Indicator/>
                   </Checkbox.Control>
-                  I wish to receive a prize if I am eligible.
+                  {t('open.forms.wish_prize')}
                 </Checkbox.Content>
               </Checkbox>
             </div>
@@ -344,7 +361,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
 
               return (
                 <div key={eventCode} className='flex flex-col gap-4'>
-                  <h2 className='text-lg font-semibold'>{eventName} Predictions</h2>
+                  <h2 className='text-lg font-semibold'>{t('open.forms.event_predictions', {event: eventName})}</h2>
                     
                   <Autocomplete
                     isRequired
@@ -352,8 +369,9 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                     onChange={(id) => handleSelectionChange(champKey, id)}
                     isInvalid={isChampInvalid}
                     isDisabled={isReadOnly}
+                    placeholder={t('open.forms.select_cuber')}
                   >
-                    <Label>Champion (1st Place)</Label>
+                    <Label>{t('open.forms.champion')}</Label>
                     <Autocomplete.Trigger>
                       <Autocomplete.Value/>
                       <Autocomplete.ClearButton/>
@@ -363,12 +381,12 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                       <Autocomplete.Filter filter={contains}>
                         <SearchField autoFocus name='search' variant='secondary'>
                           <SearchField.Group>
-                            <SearchField.SearchIcon />
-                            <SearchField.Input placeholder='Search...' />
-                            <SearchField.ClearButton />
+                            <SearchField.SearchIcon/>
+                            <SearchField.Input placeholder={t('open.forms.search')}/>
+                            <SearchField.ClearButton/>
                           </SearchField.Group>
                         </SearchField>
-                        <ListBox renderEmptyState={() => <EmptyState>No results found</EmptyState>}>
+                        <ListBox renderEmptyState={() => <EmptyState>{t('open.forms.no_results_found')}</EmptyState>}>
                           {eventCubers.map((cuber, index) => (
                             <ListBox.Item key={cuber.id.toString()} id={cuber.id.toString()} textValue={cuber.name}>
                               <div className='flex justify-between items-center w-full'>
@@ -380,7 +398,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                         </ListBox>
                       </Autocomplete.Filter>
                     </Autocomplete.Popover>
-                    <ErrorMessage>{!!isChampInvalid && <>Competitor already selected in this event</>}</ErrorMessage>
+                    <ErrorMessage>{!!isChampInvalid && <>{t('open.forms.already_selected')}</>}</ErrorMessage>
                   </Autocomplete>
                   <Autocomplete
                     isRequired
@@ -388,8 +406,9 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                     onChange={(id) => handleSelectionChange(firstRunnerKey, id)}
                     isInvalid={isFirstRunnerInvalid}
                     isDisabled={isReadOnly}
+                    placeholder={t('open.forms.select_cuber')}
                   >
-                    <Label>Runner Up (2nd Place)</Label>
+                    <Label>{t('open.forms.first_runner_up')}</Label>
                     <Autocomplete.Trigger>
                       <Autocomplete.Value/>
                       <Autocomplete.ClearButton/>
@@ -399,12 +418,12 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                       <Autocomplete.Filter filter={contains}>
                         <SearchField autoFocus name='search' variant='secondary'>
                           <SearchField.Group>
-                            <SearchField.SearchIcon />
-                            <SearchField.Input placeholder='Search...' />
-                            <SearchField.ClearButton />
+                            <SearchField.SearchIcon/>
+                            <SearchField.Input placeholder={t('open.forms.search')}/>
+                            <SearchField.ClearButton/>
                           </SearchField.Group>
                         </SearchField>
-                        <ListBox renderEmptyState={() => <EmptyState>No results found</EmptyState>}>
+                        <ListBox renderEmptyState={() => <EmptyState>{t('open.forms.no_results_found')}</EmptyState>}>
                           {eventCubers.map((cuber, index) => (
                             <ListBox.Item key={cuber.id.toString()} id={cuber.id.toString()} textValue={cuber.name}>
                               <div className='flex justify-between items-center w-full'>
@@ -416,7 +435,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                         </ListBox>
                       </Autocomplete.Filter>
                     </Autocomplete.Popover>
-                    <ErrorMessage>{!!isFirstRunnerInvalid && <>Competitor already selected in this event</>}</ErrorMessage>
+                    <ErrorMessage>{!!isFirstRunnerInvalid && <>{t('open.forms.already_selected')}</>}</ErrorMessage>
                   </Autocomplete>
                   <Autocomplete
                     isRequired
@@ -424,8 +443,9 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                     onChange={(id) => handleSelectionChange(secondRunnerKey, id)}
                     isInvalid={isSecondRunnerInvalid}
                     isDisabled={isReadOnly}
+                    placeholder={t('open.forms.select_cuber')}
                   >
-                    <Label>Second Runner Up (3rd Place)</Label>
+                    <Label>{t('open.forms.second_runner_up')}</Label>
                     <Autocomplete.Trigger>
                       <Autocomplete.Value/>
                       <Autocomplete.ClearButton/>
@@ -435,12 +455,12 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                       <Autocomplete.Filter filter={contains}>
                         <SearchField autoFocus name='search' variant='secondary'>
                           <SearchField.Group>
-                            <SearchField.SearchIcon />
-                            <SearchField.Input placeholder='Search...' />
-                            <SearchField.ClearButton />
+                            <SearchField.SearchIcon/>
+                            <SearchField.Input placeholder={t('open.forms.search')}/>
+                            <SearchField.ClearButton/>
                           </SearchField.Group>
                         </SearchField>
-                        <ListBox renderEmptyState={() => <EmptyState>No results found</EmptyState>}>
+                        <ListBox renderEmptyState={() => <EmptyState>{t('open.forms.no_results_found')}</EmptyState>}>
                           {eventCubers.map((cuber, index) => (
                             <ListBox.Item key={cuber.id.toString()} id={cuber.id.toString()} textValue={cuber.name}>
                               <div className='flex justify-between items-center w-full'>
@@ -452,7 +472,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                         </ListBox>
                       </Autocomplete.Filter>
                     </Autocomplete.Popover>
-                    <ErrorMessage>{!!isSecondRunnerInvalid && <>Competitor already selected in this event</>}</ErrorMessage>
+                    <ErrorMessage>{!!isSecondRunnerInvalid && <>{t('open.forms.already_selected')}</>}</ErrorMessage>
                   </Autocomplete>
                 </div>
               );
@@ -465,12 +485,13 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                 isSelected={termsAccepted} 
                 onChange={setTermsAccepted}
                 isDisabled={isReadOnly}
+                variant='secondary'
               >
                 <Checkbox.Content>
                   <Checkbox.Control>
                     <Checkbox.Indicator/>
                   </Checkbox.Control>
-                  I confirm my predictions are final and accept the rules.
+                  {t('open.forms.confirm')}
                 </Checkbox.Content>
               </Checkbox>
               
@@ -481,13 +502,13 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                 isPending={isLoading}
                 className='w-full font-bold text-lg py-6'
               >
-                {isReadOnly 
-                  ? 'Prediction Locked In 🔒' 
+                {t(`open.forms.${isReadOnly 
+                  ? 'read_only' 
                   : isSubmitted 
-                  ? 'Update Prediction'
+                  ? 'update'
                   : hasAnyDuplicates 
-                  ? 'Fix Errors to Submit' 
-                  : 'Submit Prediction'}
+                  ? 'fix_errors' 
+                  : 'submit'}`)}
               </Button>
             </div>
           </Form>
