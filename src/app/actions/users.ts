@@ -1,6 +1,6 @@
 'use server';
 
-import { Role } from '@/generated/prisma/enums';
+import { Role } from '@/generated/prisma/client';
 import { PermissionError } from '../lib/errors/PermissionError';
 import { userService } from '../lib/services/instances';
 import { auth } from '@/auth';

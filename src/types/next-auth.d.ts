@@ -1,4 +1,4 @@
-import { Role } from '@/generated/prisma/enums';
+import { Role } from '@/generated/prisma/client';
 import NextAuth, { DefaultSession } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
 

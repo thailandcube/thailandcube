@@ -1,6 +1,6 @@
 'use server';
 
-import { EventType, RecordType } from '@/generated/prisma/enums';
+import { EventType, RecordType } from '@/generated/prisma/client';
 import { nationalRecordService } from '../lib/services/instances';
 
 /**
