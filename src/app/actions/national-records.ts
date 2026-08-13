@@ -1,108 +1,84 @@
 'use server';
 
-import { prisma } from '@/lib/prisma';
-import { EventType, NationalRecord, RecordType } from '@prisma/client';
-import { Bytes } from '@prisma/client/runtime/library';
+import { EventType, RecordType } from '@/generated/prisma/client';
+import { nationalRecordService } from '../lib/services/instances';
 
-interface NationalRecordPayload extends NationalRecord
-{
-    image?: Bytes;
-    newImage?: ReadableStream<Uint8Array<ArrayBuffer>>
+/**
+ * Fetches the all national records.
+ */
+export async function getAllNationalRecords() {
+  try {
+    const records = await nationalRecordService.getAll();
+
+    return {
+      success: true,
+      data: records,
+    };
+  }
+  catch (error) {
+    console.error('Error in getAllNationalRecords action:', error);
+  
+    return { 
+      success: false, 
+      error: 'Failed to retrieve national records. Please try again later.' 
+    };
+  }
 }
 
-export async function getNRecentNRs(n: number)
-{
-    try
-    {
-        const recentNRs = await prisma.nationalRecord.findMany(
-            {
-                take: n,
-                orderBy:
-                {
-                    updatedAt: 'desc'
-                }
-            }
-        );
-
-        return recentNRs;
-    }
-    catch (error) 
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
-}
-
-export async function getAllNRs()
-{
-    try
-    {
-        const allNRs = await prisma.nationalRecord.findMany(
-            {
-                orderBy:
-                {
-                    id: 'asc'
-                }
-            }
-        );
-
-        const formattedNRs = allNRs.map((record) =>
-        (
-            {
-                ...record,
-                imageData: Buffer.from(record.imageData).toString('base64'),
-            }
-        ));
-
-        return formattedNRs;
-    }
-    catch (error) 
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
-}
-
-export async function submitNR(formData: FormData)
-{
-    try
-    {
-        const file = formData.get('file') as File;
+/**
+ * Fetches the most recent national records.
+ * @param limit The number of records to retrieve (default is 1).
+ */
+export async function getRecentNationalRecords(limit: number = 1) {
+  try {
+    const records = await nationalRecordService.getRecentNationalRecords(limit);
     
-        if (!file || file.size === 0)
-            return { success: false, message: 'No file uploaded' };
+    return { 
+      success: true, 
+      data: records
+    };
+  } 
+  catch (error) {
+    console.error('Error in getRecentNationalRecords action:', error);
+    return { 
+      success: false, 
+      error: 'Failed to retrieve recent national records.' 
+    };
+  }
+}
 
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+/**
+ * Update national record data
+ * @param id The id of the updated national record.
+ * @param formData The data of the updated national record.
+ */
+export async function updateNationalRecord(id: number, formData: FormData) {
+  try {
+    const file = formData.get('file') as File;
 
-        const newData = {
-            holder: formData.get('holder') as string,
-            competition: formData.get('competition') as string,
-            result: formData.get('result') as string,
-            caption: formData.get('caption') as string,
-            event: formData.get('event') as EventType,
-            type: formData.get('type') as RecordType,
-            imageFileName: file.name,
-            mimeType: file.type,
-            imageData: buffer
-        };
+    if (!file || file.size === 0)
+      return { success: false, message: 'No file uploaded' };
 
-        await prisma.nationalRecord.upsert(
-            {
-                where:
-                {
-                    id: Number(formData.get('id')),
-                },
-                update: newData,
-                create: newData
-            }
-        );
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-        return { success: true, message: 'Uploaded Successfully' };
-    }
-    catch (error) 
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
+    const newData = {
+      holder: formData.get('holder') as string,
+      competition: formData.get('competition') as string,
+      result: formData.get('result') as string,
+      caption: formData.get('caption') as string,
+      event: formData.get('event') as EventType,
+      type: formData.get('type') as RecordType,
+      imageFileName: file.name,
+      mimeType: file.type,
+      imageData: buffer
+    };
+
+    await nationalRecordService.updateNationalRecord(id, newData);
+
+    return { success: true, message: 'Record updated successfully' };
+  }
+  catch (error) {
+    return { success: false, message: error };
+  }
 }

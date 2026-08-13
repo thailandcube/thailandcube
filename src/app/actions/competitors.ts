@@ -1,123 +1,37 @@
 'use server';
 
-import { EventType } from '@prisma/client';
-import { prisma } from '@/lib/prisma';
-import { getEventByCompetitionId } from '@/app/actions/events';
+import { CompetitorOptions } from '../lib/repositories/CompetitorRepository';
+import { competitorService, registrationService } from '../lib/services/instances';
 
-interface Option
-{
-    withRegistrations?: boolean;
-    withResults?: boolean;
+/**
+ * Fetches the most recent national records.
+ * @param competitionId The competition ID of the desired competition.
+ * @param options The options of the querying (result data)
+ */
+export async function getCompetitorsByCompetitionId(competitionId: string, options: CompetitorOptions = {}) {
+  try {
+    return await competitorService.getCompetitorsByCompetitionId(competitionId, options);
+  }
+  catch (error) {
+    console.error('Failed to fetch all competitions in action:', error);
+    return [];
+  }
 }
 
-export async function getAllCompetitorsByCompetitionId(competitionId: string, options: Option = {})
-{
-    const { withRegistrations = true, withResults = false } = options; 
+/**
+ * Delete specific competitor from specific competition
+ * @param competitorId The competitor ID of the desired deletion.
+ * @param competitionId The competition ID of the desired deletion.
+ */
+export async function deleteCompetitorFromCompetition(competitorId: number, competitionId: string) {
+  try {
+    await registrationService.withdrawCompetitor(competitorId, competitionId);
 
-    try
-    {
-        const competitors = await prisma.competitor.findMany(
-            {
-                where:
-                {
-                    registrations:
-                    {
-                        some:
-                        {
-                            competitionId
-                        }
-                    }
-                },
-                include:
-                {
-                    registrations: withRegistrations ?
-                    {
-                        where:
-                        {
-                            competitionId: competitionId
-                        },
-                        // include:
-                        // {
-                        //     events: true,
-                        // },
-                        select:
-                        {
-                            competitionId: true,
-                            events:
-                            {
-                                select:
-                                {
-                                    event: true,
-                                    eventId: true,
-                                }
-                            },
-                            id: true,
-                        }
-                    } : false,
-                    results: withResults,
-                }
-            }
-        );
+    return {success: true, message: 'Competitor successfully removed from competition.' };
+  }
+  catch (error) {
+    console.error('Failed to delete competitor in action:', error);
 
-        return competitors || [];
-    }
-    catch (error)
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
-}
-
-export async function getCompetitorsInRound({competitionId, event, maxAge, round}: {competitionId: string, event: EventType, maxAge: number, round: number}, options: Option = {})
-{
-    const { withRegistrations = false, withResults = true } = options; 
-
-    try
-    {   
-        const roundData = await prisma.round.findFirst(
-            {
-                where:
-                {
-                    round,
-                    event:
-                    {
-                        competitionId,
-                        event,
-                        maxAge: Number.isNaN(maxAge) ? undefined : maxAge,
-                    },
-                }
-            }
-        );
-
-        const competitors = await prisma.result.findMany(
-            {
-                where:
-                {
-                    roundId: roundData?.id,
-                },
-                include:
-                {
-                    competitor: 
-                    {
-                        include:
-                        {
-                            registrations: withRegistrations,
-                            results: withResults,
-                        }
-                    },
-                },
-                orderBy:
-                {
-                    competitor: { name: 'asc' }
-                }
-            }
-        );
-
-        return competitors;
-    }
-    catch (error)
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
+    return {success: false, message: error || 'Failed to delete'};
+  }
 }

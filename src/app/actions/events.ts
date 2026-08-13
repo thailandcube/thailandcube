@@ -1,93 +1,19 @@
 'use server';
 
-import { Event, EventType } from '@prisma/client';
-import { prisma } from '@/lib/prisma';
+import { EventOptions } from '../lib/repositories/EventRepository';
+import { eventService } from '../lib/services/instances';
 
-interface Options
-{
-    withRounds?: boolean
-    withRegistrationEvents?: boolean
-} 
-
-export async function getEventByCompetitionId({competitionId, event}: {competitionId: string, event: EventType}, options: Options = {})
-{
-    const { withRounds = true, withRegistrationEvents = true } = options; 
-
-    const queryRelations = {
-        rounds: withRounds,
-        registrationEvents: withRegistrationEvents
-    };
-
-    try
-    {
-        const queriedEvent = await prisma.event.findFirst(
-            {
-                where:
-                {
-                    competitionId,
-                    event
-                },
-                include: queryRelations
-            }
-        );
-
-        return queriedEvent || null;
-    }
-    catch (error) 
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
-}
-
-export async function getAllEventsByCompetitionId(competitionId: string, options: Options = {})
-{
-    const { withRounds = true, withRegistrationEvents = true } = options; 
-
-    const queryRelations = {
-        rounds: withRounds,
-        registrationEvents: withRegistrationEvents
-    };
-
-
-    try
-    {
-        const queriedEvent = await prisma.event.findMany(
-            {
-                where:
-                {
-                    competitionId
-                },
-                include: queryRelations
-            }
-        );
-
-        return queriedEvent || null;
-    }
-    catch (error) 
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
-}
-
-export async function createEvent({eventData}: {eventData: Event})
-{
-    const { id, ...data } = eventData;
-
-    try
-    {
-        await prisma.event.create(
-            {
-                data
-            }
-        );
-
-        return true;
-    }
-    catch (error) 
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
+/**
+ * Fetches all events in the targetted competition
+ * @param competitionId The competition ID of the desired competition.
+ * @param options The options of the querying (result data)
+ */
+export async function getEventsInCompetition(competitionId: string, options: EventOptions) {
+  try {
+    return await eventService.getEventsInCompetition(competitionId, options);
+  }
+  catch (error) {
+    console.error('Failed to fetch all events inside competition in action:', error);
+    return [];
+  }
 }

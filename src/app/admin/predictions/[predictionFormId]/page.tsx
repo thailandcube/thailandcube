@@ -1,60 +1,19 @@
-import { prisma } from '@/lib/prisma';
+import { getPredictionFormById } from '@/app/actions/predictions';
 import { notFound } from 'next/navigation';
-import PredictionDashboardAdmin from '@/app/components/PredictionDashboardAdmin';
+import AdminPredictionDashboard from './_components/AdminPredictionDashboard';
 
-export default async function PredictionFormAdminPage({ 
-    params 
-}: { 
-    params: Promise<{ predictionFormId: string }> 
-}) 
-{
-    const resolvedParams = await params;
-    const formId = resolvedParams.predictionFormId;
+export default async function AdminPredictionViewPage({ params }: { params: Promise<{ predictionFormId: string }>}) {
+  const resolvedParams = await params;
+  const formId = resolvedParams.predictionFormId;
 
-    // Deep fetch for all admin dashboard requirements
-    const form = await prisma.predictionForm.findUnique({
-        where: { id: formId },
-        include: {
-            _count: {
-                select: {
-                    submissions: true,
-                    cubers: true
-                }
-            },
-            // 1. MUST include answers to pre-fill the form
-            answers: true, 
-            
-            // 2. MUST include cubers to populate the dropdown menus (Fixes the iterable error)
-            cubers: true,  
-            
-            submissions: {
-                orderBy: {
-                    score: 'desc'
-                },
-                include: {
-                    user: {
-                        include: {
-                            competitor: true
-                        }
-                    },
-                    predictions: {
-                        include: {
-                            predictedCuber: true
-                        }
-                    }
-                }
-            }
-        }
-    });
+  const form = await getPredictionFormById(formId, true);
 
-    if (!form) 
-    {
-        notFound();
-    }
+  if (!form.success)
+    notFound();
 
-    return (
-        <div className="p-4 md:p-6 w-full max-w-7xl mx-auto">
-            <PredictionDashboardAdmin form={form} />
-        </div>
-    );
+  return (
+    <div className="p-4 md:p-6 w-full max-w-7xl mx-auto">
+      <AdminPredictionDashboard form={form.data} />
+    </div>
+  )
 }

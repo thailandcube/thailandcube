@@ -2,9 +2,24 @@ import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
-    /* config options here */
-    reactCompiler: true,
-    allowedDevOrigins: ['*.ngrok-free.app']
+  reactCompiler: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avatars.worldcubeassociation.org',
+      },
+    ],
+  },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored: ['**/node_modules'],
+      };
+    }
+    return config;
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();

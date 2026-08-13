@@ -1,15 +1,11 @@
-import CreatePredictions from '@/app/components/CreatePredictions';
-import PredictionFormsListAdmin from '@/app/components/PredictionFormsListAdmin';
+import AdminCreatePredictions from './_components/AdminCreatePredictions';
+import AdminPredictionFormsList from './_components/AdminPredictionFormsList';
 
-const Page = () => 
-{
-    return (
-        <>
-            <CreatePredictions/>
-
-            <PredictionFormsListAdmin/>
-        </>
-    );
+export default function AdminPredictionPage() {
+  return (
+    <>
+      <AdminCreatePredictions/>
+      <AdminPredictionFormsList/>
+    </>
+  );
 }
-
-export default Page;

@@ -1,12 +1,9 @@
-import CaptionGenerator from '@/app/components/CaptionGenerator';
+import CaptionGenerator from './_components/CaptionGenerator';
 
-const Page = () =>
-{
-    return (
-        <>
-            <CaptionGenerator/>
-        </>
-    );
+export default function CaptionPage() {
+  return (
+    <>
+      <CaptionGenerator/>
+    </>
+  );
 }
-
-export default Page;

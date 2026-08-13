@@ -1,81 +1,30 @@
 'use server';
 
-import { Competition } from '@prisma/client';
-import { prisma } from '@/lib/prisma';
+import { competitionService } from '../lib/services/instances';
 
-interface Options
-{
-    withEvent?: boolean;
-    withRound?: boolean;
-    withRegistrations?: boolean;
+/**
+ * Fetches all competitions in the database.
+ */
+export async function getAllCompetitions() {
+  try {
+    return await competitionService.getAll();
+  }
+  catch (error) {
+    console.error('Failed to fetch all competitions in action:', error);
+    return [];
+  }
 }
 
-export async function getCompetition(competitionId: string, options: Options = {}) 
-{
-    const { withEvent = true, withRound = false, withRegistrations = true } = options; 
-
-    try 
-    {
-        return await prisma.competition.findUnique({
-            where: { competitionId },
-            include:
-            {
-                registrations: withRegistrations,
-                events:
-                {
-                    include:
-                    {
-                        rounds: withRound,
-                    } 
-                }
-            }
-        });
-    } 
-    catch (error) 
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
-}
-
-export async function getAllCompetitions(options: Options = {}) 
-{
-    const { withEvent = true, withRegistrations = true } = options; 
-
-    const queryRelations = {
-        events: withEvent,
-        registrations: withRegistrations
-    };
-
-    try 
-    {
-        return await prisma.competition.findMany({
-            include: queryRelations,
-            orderBy: { startDate: 'desc' }
-        });
-    } 
-    catch (error) 
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
-}
-
-export async function createNewCompetition(payload: Competition)
-{
-    try
-    {
-        const newCompetition = await prisma.competition.create(
-            {
-                data: payload
-            }
-        );
-
-        return newCompetition;
-    }
-    catch (error) 
-    {
-        console.error('Database Error:', error);
-        return null;
-    }
+/**
+ * Fetches all competitions in the database.
+ * @param id Competition ID of the target
+ */
+export async function getCompetitionById(id: string) {
+  try {
+    return await competitionService.getById(id);
+  }
+  catch (error) {
+    console.error(`Failed to fetch competition with an id of ${id}  in action:`, error);
+    return null;
+  }
 }
