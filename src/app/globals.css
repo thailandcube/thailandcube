@@ -31,15 +31,12 @@
   --radius-md: var(--radius);
 }
 
-<<<<<<< HEAD
-.flag-shadow 
-{
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+.flag-shadow {
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
-=======
+
 /* @layer components {
   .button--primary {
     @apply bg-primary/70 hover:bg-primary/60;
   }
 } */
->>>>>>> release/2.0.0
