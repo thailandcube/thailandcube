@@ -1,11 +1,323 @@
+<<<<<<< HEAD
+generator client {
+    provider = "prisma-client-js"
+    // output   = "../src/generated/prisma"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum Role {
+    USER
+    ADMIN
+    SUPERUSER
+}
+
+enum EventType {
+    E333    @map("333")
+    E222    @map("222")
+    E444    @map("444")
+    E555    @map("555")
+    E666    @map("666")
+    E777    @map("777")
+    E333BF  @map("333bf")
+    E333FM  @map("333fm")
+    E333OH  @map("333oh")
+    CLOCK   @map("clock")
+    MINX    @map("minx")
+    PYRAM   @map("pyram")
+    SKEWB   @map("skewb")
+    SQ1     @map("sq1")
+    E444BF  @map("444bf")
+    E555BF  @map("555bf")
+    E333MBF @map("333mbf")
+}
+
+enum Format {
+    BO1
+    BO2
+    BO3
+    MO3
+    AO5
+    BO5
+    H2H
+}    
+
+enum RegistrationStatus {
+    PENDING
+    ACCEPTED
+    WAITING_LIST
+    DELETED
+}
+
+enum RecordType {
+    SINGLE
+    AVERAGE
+}
+
+enum ResultStatus {
+    ACTIVE
+    DROPOUT
+}
+
+enum Placement {
+    CHAMPION
+    FIRST_RUNNER_UP
+    SECOND_RUNNER_UP
+}
+
+enum PredictionStatus {
+    PENDING
+    CORRECT
+    PODIUM
+    INCORRECT
+}
+
+model User {
+    id                      Int         @id
+    competitor              Competitor?
+    role                    Role        @default(USER)
+
+    predictionSubmission    PredictionSubmission[]
+    
+    @@map("user")
+}
+
+model Competitor {
+    id              Int             @id @default(autoincrement())
+    wcaId           String?         @unique @map("wca_id")
+    name            String
+    region          String          @default("TH")
+    userId          Int?            @unique @map("user_id")
+    user            User?           @relation(fields: [userId], references: [id])
+    registrations   Registration[]
+    results         Result[]
+    
+    @@map("competitor")
+}
+
+model Registration {
+    id              Int                 @id @default(autoincrement())
+    competitionId   String              @map("competition_id")
+    competition     Competition         @relation(fields: [competitionId], references: [competitionId])
+    competitorId    Int                 @map("competitor_id")
+    competitor      Competitor          @relation(fields: [competitorId], references: [id])
+    events          RegistrationEvent[]
+    // eventId      Int                 @map("event_id")
+    // event        Event               @relation(fields: [eventId], references: [id])
+    status          RegistrationStatus
+
+    @@unique([competitorId, competitionId])
+    @@map("registration")
+}
+
+model RegistrationEvent {
+    id              Int             @id @default(autoincrement())
+    registrationId  Int             @map("registration_id")
+    registration    Registration    @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+    eventId         Int             @map("event_id")
+    event           Event           @relation(fields: [eventId], references: [id])
+
+    @@unique([registrationId, eventId])
+    @@map("registration_event")
+}
+
+model Competition {
+    competitionId   String          @id @map("id")
+    proposalId      Int?            @unique @map("proposal_id")
+    name            String          @unique
+    shortName       String?         @map("short_name")
+    nameReason      String?         @map("name_reason")
+    venue           String
+    startDate       DateTime        @map("start_date") // DB will store in UTC
+    endDate         DateTime        @map("end_date")   // DB will store in UTC
+    events          Event[]
+    registrations   Registration[]
+
+    @@map("competition")
+}
+
+model Event {
+    id                  Int                 @id @default(autoincrement())
+    event               EventType      
+    competitionId       String              @map("competition_id")
+    competition         Competition         @relation(fields: [competitionId], references: [competitionId])
+    maxAge              Int?                @map("max_age")
+    registrationEvents  RegistrationEvent[]
+    rounds              Round[]
+
+    @@unique([event, competitionId, maxAge])
+    @@map("event")
+}
+
+model Round {
+    id              Int         @id @default(autoincrement())
+    // competitionId   String      @map("competition_id")
+    // competition     Competition @relation(fields: [competitionId], references: [competitionId])
+    eventId         Int         @map("event_id")
+    event           Event       @relation(fields: [eventId], references: [id])
+    round           Int
+    timeLimit       Float       @default(600.0) @map("time_limit")
+    cutoff          Float?
+    proceed         Float?
+    tournamentUrl   String?     @map("tournament_url")
+    format          Format
+    open            Boolean     @default(false)
+    results         Result[]
+
+    @@unique([eventId, round])
+    // @@unique([competitionId, eventId, round])
+    @@map("round")
+}
+
+model Result {
+    id              Int             @id @default(autoincrement())
+    roundId         Int             @map("round_id")
+    competitorId    Int             @map("competitor_id")
+    status          ResultStatus    @default(ACTIVE)
+    display         String?
+    attempts        Float[]
+    result          Float?
+    best            Float?
+    competitor      Competitor      @relation(fields: [competitorId], references: [id])
+    round           Round           @relation(fields: [roundId], references: [id])
+
+    @@unique([competitorId, roundId])
+    @@map("result")
+}
+
+model NationalRecord {
+    id              Int         @id @default(autoincrement())
+    holder          String
+    competition     String
+    caption         String?
+    event           EventType
+    result          String
+    type            RecordType
+    imageFileName   String      @map("image_file_name")
+    mimeType        String      @map("mime_type")
+    imageData       Bytes       @map("image_data")
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
+
+    @@map("national_record")
+}
+
+model PredictionForm {
+    id            String               @id @unique @map("competition_id") 
+    name          String               
+    
+    // Replace isActive with these two lines:
+    openTime      DateTime             @map("open_time")
+    closeTime     DateTime             @map("close_time")
+
+    isLocked      Boolean              @default(false) @map("is_locked")
+    
+    isThaiOnly    Boolean              @default(false) @map("is_thai_only")
+
+    createdAt     DateTime             @default(now()) @map("created_at")
+    updatedAt     DateTime             @updatedAt @map("updated_at")
+
+    submissions   PredictionSubmission[]
+    cubers        PredictionEventCompetitor[]
+    answers       PredictionAnswer[]
+
+    @@map("prediction_form")
+}
+
+model PredictionEventCompetitor {
+    id               Int                @id @default(autoincrement())
+    predictionFormId String             @map("prediction_form_id")
+    predictionForm   PredictionForm     @relation(fields: [predictionFormId], references: [id], onDelete: Cascade)
+    
+    name             String
+    wcaId            String?            @map("wca_id") // Crucial addition from WCIF for automated grading
+    countryIso2      String             @map("country_iso2")
+    event            EventType          
+    predictions      PredictionRecord[]
+    pos              Int
+    officialWins     PredictionAnswer[]
+
+    @@unique([predictionFormId, name, event])
+    @@map("prediction_event_competitor") 
+}
+
+model PredictionSubmission {
+    id               Int                  @id @default(autoincrement())
+    predictionFormId String               @map("prediction_form_id")
+    predictionForm   PredictionForm       @relation(fields: [predictionFormId], references: [id], onDelete: Cascade)
+    
+    userId           Int?                 @map("user_id")
+    user             User?                @relation(fields: [userId], references: [id])
+    
+    score            Int                  @default(0)
+    // isCompetitor     Boolean              @map("is_competitor")
+    // predictorName    String               @map("predictor_name")
+    wcaId            String?              @map("wca_id")
+    // termsAccepted    Boolean              @map("terms_accepted")
+    wantsPrize       Boolean              @map("wants_prize")
+    createdAt        DateTime             @default(now()) @map("created_at")
+
+    // Bonus Question Fields
+    // maxFinalistAo5      String             @map("max_finalist_ao5")
+    // maxFinalistAo5Score Float              @default(0) @map("max_finalist_ao5_score")
+    // allNrsCountScore    Float              @default(0) @map("all_nrs_count_score")
+    // allCrsCountScore    Float              @default(0) @map("all_crs_count_score")
+    // allWrsCountScore    Float              @default(0) @map("all_wrs_count_score")
+
+    predictions         PredictionRecord[]
+
+    // Users can only submit once per unique prediction form instance
+    @@unique([userId, predictionFormId])
+    @@map("prediction_submissions")
+}
+
+model PredictionRecord {
+    id               Int                         @id @default(autoincrement())
+    submissionId     Int                         @map("submission_id")
+    submission       PredictionSubmission        @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+    
+    event            EventType            
+    placement        Placement
+    score            Float                       @default(0)
+
+    predictedCuberId Int                         @map("predicted_cuber_id")
+    predictedCuber   PredictionEventCompetitor   @relation(fields: [predictedCuberId], references: [id])
+    status           PredictionStatus            @default(PENDING)
+
+    @@unique([submissionId, event, placement])
+    @@map("prediction_records")
+}
+
+model PredictionAnswer {
+    id               Int            @id @default(autoincrement())
+    predictionFormId String         @map("prediction_form_id")
+    predictionForm   PredictionForm @relation(fields: [predictionFormId], references: [id], onDelete: Cascade)
+    
+    event            EventType
+    placement        Placement
+    
+    // We link to the specific cuber from the psych sheet that won
+    actualCuberId    Int            @map("actual_cuber_id")
+    actualCuber      PredictionEventCompetitor @relation(fields: [actualCuberId], references: [id])
+
+    @@unique([predictionFormId, event, placement])
+    @@map("prediction_answers")
+=======
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
 generator client {
   provider = "prisma-client-js"
-//   output   = "../src/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -25,6 +337,7 @@ enum EventType {
   E333FM  @map("333fm")
   E333OH  @map("333oh")
   CLOCK   @map("clock")
+  FTO     @map("fto")
   MINX    @map("minx")
   PYRAM   @map("pyram")
   SKEWB   @map("skewb")
@@ -61,110 +374,127 @@ enum ResultStatus {
   DROPOUT
 }
 
+enum Placement {
+  CHAMPION
+  FIRST_RUNNER_UP
+  SECOND_RUNNER_UP
+}
+
+enum PredictionStatus {
+  PENDING
+  CORRECT
+  PODIUM
+  INCORRECT
+}
+
 model User {
-  id         Int         @id
-  competitor Competitor?
-  role       Role        @default(USER)
+  id                      Int         @id
+  competitor              Competitor?
+  role                    Role        @default(USER)
+
+  predictionSubmission    PredictionSubmission[]
+  
   @@map("user")
 }
 
 model Competitor {
-  id            Int             @id @default(autoincrement())
-  wcaId         String?         @unique @map("wca_id")
-  name          String
-  region        String          @default("TH")
-  userId        Int?            @unique @map("user_id")
-  user          User?           @relation(fields: [userId], references: [id])
-  registrations Registration[]
-  results       Result[]
+  id              Int             @id @default(autoincrement())
+  wcaId           String?         @unique @map("wca_id")
+  name            String
+  region          String          @default("TH")
+  userId          Int?            @unique @map("user_id")
+  user            User?           @relation(fields: [userId], references: [id])
+  registrations   Registration[]
+  results         Result[]
+  
   @@map("competitor")
 }
 
 model Registration {
-  id            Int         @id @default(autoincrement())
-  competitionId String      @map("competition_id")
-  competition   Competition @relation(fields: [competitionId], references: [competitionId])
-  competitorId  Int         @map("competitor_id")
-  competitor    Competitor  @relation(fields: [competitorId], references: [id])
-  events        RegistrationEvent[]
-//   eventId       Int         @map("event_id")
-//   event         Event       @relation(fields: [eventId], references: [id])
-  status        RegistrationStatus
+  id              Int                 @id @default(autoincrement())
+  competitionId   String              @map("competition_id")
+  competition     Competition         @relation(fields: [competitionId], references: [competitionId])
+  competitorId    Int                 @map("competitor_id")
+  competitor      Competitor          @relation(fields: [competitorId], references: [id])
+  events          RegistrationEvent[]
+  // eventId      Int                 @map("event_id")
+  // event        Event               @relation(fields: [eventId], references: [id])
+  status          RegistrationStatus
 
   @@unique([competitorId, competitionId])
   @@map("registration")
 }
 
 model RegistrationEvent {
-  id                Int             @id @default(autoincrement())
-  registrationId    Int             @map("registration_id")
-  registration      Registration    @relation(fields: [registrationId], references: [id], onDelete: Cascade)
-  eventId           Int             @map("event_id")
-  event             Event           @relation(fields: [eventId], references: [id])
+  id              Int             @id @default(autoincrement())
+  registrationId  Int             @map("registration_id")
+  registration    Registration    @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  eventId         Int             @map("event_id")
+  event           Event           @relation(fields: [eventId], references: [id])
 
   @@unique([registrationId, eventId])
   @@map("registration_event")
 }
 
 model Competition {
-  competitionId String   @id     @map("id")
-  proposalId    Int?     @unique @map("proposal_id")
-  name          String   @unique
-  shortName     String?  @map("short_name")
-  nameReason    String?  @map("name_reason")
-  venue         String
-  startDate     DateTime @map("start_date") // DB will store in UTC
-  endDate       DateTime @map("end_date")   // DB will store in UTC
-  events        Event[]
-  registrations Registration[]
+  competitionId   String          @id @map("id")
+  proposalId      Int?            @unique @map("proposal_id")
+  name            String          @unique
+  shortName       String?         @map("short_name")
+  nameReason      String?         @map("name_reason")
+  venue           String
+  startDate       DateTime        @map("start_date") // DB will store in UTC
+  endDate         DateTime        @map("end_date")   // DB will store in UTC
+  events          Event[]
+  registrations   Registration[]
 
   @@map("competition")
 }
 
 model Event {
-  id            Int             @id @default(autoincrement())
-  event         EventType      
-  competitionId String          @map("competition_id")
-  competition   Competition     @relation(fields: [competitionId], references: [competitionId])
-  maxAge        Int?            @map("max_age")
-  registrationEvents RegistrationEvent[]
-  rounds        Round[]
+  id                  Int                 @id @default(autoincrement())
+  event               EventType      
+  competitionId       String              @map("competition_id")
+  competition         Competition         @relation(fields: [competitionId], references: [competitionId])
+  maxAge              Int?                @map("max_age")
+  registrationEvents  RegistrationEvent[]
+  rounds              Round[]
 
   @@unique([event, competitionId, maxAge])
   @@map("event")
 }
 
 model Round {
-  id                Int      @id @default(autoincrement())
-//  competitionId  String      @map("competition_id")
-//  competition    Competition @relation(fields: [competitionId], references: [competitionId])
-  eventId           Int      @map("event_id")
-  event             Event    @relation(fields: [eventId], references: [id])
-  round             Int
-  timeLimit         Float    @default(600.0) @map("time_limit")
-  cutoff            Float?
-  proceed           Float?
-  tournamentUrl     String?  @map("tournament_url")
-  format            Format
-  open              Boolean  @default(false)
-  results           Result[]
+  id              Int         @id @default(autoincrement())
+  // competitionId   String      @map("competition_id")
+  // competition     Competition @relation(fields: [competitionId], references: [competitionId])
+  eventId         Int         @map("event_id")
+  event           Event       @relation(fields: [eventId], references: [id])
+  round           Int
+  timeLimit       Float       @default(600.0) @map("time_limit")
+  cutoff          Float?
+  proceed         Float?
+  tournamentUrl   String?     @map("tournament_url")
+  format          Format
+  open            Boolean     @default(false)
+  results         Result[]
 
   @@unique([eventId, round])
-//  @@unique([competitionId, eventId, round])
+  // @@unique([competitionId, eventId, round])
   @@map("round")
 }
 
 model Result {
-  id           Int          @id @default(autoincrement())
-  roundId      Int          @map("round_id")
-  competitorId Int          @map("competitor_id")
-  status       ResultStatus @default(ACTIVE)
-  display      String?
-  attempts     Float[]
-  result       Float?
-  best         Float?
-  competitor   Competitor   @relation(fields: [competitorId], references: [id])
-  round        Round        @relation(fields: [roundId], references: [id])
+  id              Int             @id @default(autoincrement())
+  roundId         Int             @map("round_id")
+  competitorId    Int             @map("competitor_id")
+  status          ResultStatus    @default(ACTIVE)
+  display         String?
+  attempts        Float[]
+  result          Float?
+  best            Float?
+  competitor      Competitor      @relation(fields: [competitorId], references: [id])
+  round           Round           @relation(fields: [roundId], references: [id])
 
   @@unique([competitorId, roundId])
   @@map("result")
@@ -178,11 +508,112 @@ model NationalRecord {
   event           EventType
   result          String
   type            RecordType
-  imageFileName   String  @map("image_file_name")
-  mimeType        String  @map("mime_type")
-  imageData       Bytes   @map("image_data")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  imageFileName   String      @map("image_file_name")
+  mimeType        String      @map("mime_type")
+  imageData       Bytes       @map("image_data")
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 
   @@map("national_record")
+}
+
+model PredictionForm {
+  id            String               @id @unique @map("competition_id") 
+  name          String               
+  
+  openTime      DateTime             @map("open_time")
+  closeTime     DateTime             @map("close_time")
+
+  isLocked      Boolean              @default(false) @map("is_locked")
+  
+  isThaiOnly    Boolean              @default(false) @map("is_thai_only")
+
+  createdAt     DateTime             @default(now()) @map("created_at")
+  updatedAt     DateTime             @updatedAt @map("updated_at")
+
+  submissions   PredictionSubmission[]
+  cubers        PredictionEventCompetitor[]
+  answers       PredictionAnswer[]
+
+  @@map("prediction_form")
+}
+
+model PredictionEventCompetitor {
+  id               Int                @id @default(autoincrement())
+  predictionFormId String             @map("prediction_form_id")
+  predictionForm   PredictionForm     @relation(fields: [predictionFormId], references: [id], onDelete: Cascade)
+  
+  name             String
+  wcaId            String?            @map("wca_id") // Crucial addition from WCIF for automated grading
+  countryIso2      String             @map("country_iso2")
+  event            EventType          
+  predictions      PredictionRecord[]
+  pos              Int
+  officialWins     PredictionAnswer[]
+
+  @@unique([predictionFormId, name, event])
+  @@map("prediction_event_competitor") 
+}
+
+model PredictionSubmission {
+  id               Int                  @id @default(autoincrement())
+  predictionFormId String               @map("prediction_form_id")
+  predictionForm   PredictionForm       @relation(fields: [predictionFormId], references: [id], onDelete: Cascade)
+  
+  userId           Int?                 @map("user_id")
+  user             User?                @relation(fields: [userId], references: [id])
+  
+  score            Int                  @default(0)
+  // isCompetitor     Boolean              @map("is_competitor")
+  // predictorName    String               @map("predictor_name")
+  wcaId            String?              @map("wca_id")
+  // termsAccepted    Boolean              @map("terms_accepted")
+  wantsPrize       Boolean              @map("wants_prize")
+  createdAt        DateTime             @default(now()) @map("created_at")
+
+  // Bonus Question Fields
+  // maxFinalistAo5      String             @map("max_finalist_ao5")
+  // maxFinalistAo5Score Float              @default(0) @map("max_finalist_ao5_score")
+  // allNrsCountScore    Float              @default(0) @map("all_nrs_count_score")
+  // allCrsCountScore    Float              @default(0) @map("all_crs_count_score")
+  // allWrsCountScore    Float              @default(0) @map("all_wrs_count_score")
+
+  predictions         PredictionRecord[]
+
+  // Users can only submit once per unique prediction form instance
+  @@unique([userId, predictionFormId])
+  @@map("prediction_submissions")
+}
+
+model PredictionRecord {
+  id               Int                         @id @default(autoincrement())
+  submissionId     Int                         @map("submission_id")
+  submission       PredictionSubmission        @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  
+  event            EventType            
+  placement        Placement
+  score            Float                       @default(0)
+
+  predictedCuberId Int                         @map("predicted_cuber_id")
+  predictedCuber   PredictionEventCompetitor   @relation(fields: [predictedCuberId], references: [id])
+  status           PredictionStatus            @default(PENDING)
+
+  @@unique([submissionId, event, placement])
+  @@map("prediction_records")
+}
+
+model PredictionAnswer {
+  id               Int            @id @default(autoincrement())
+  predictionFormId String         @map("prediction_form_id")
+  predictionForm   PredictionForm @relation(fields: [predictionFormId], references: [id], onDelete: Cascade)
+  
+  event            EventType
+  placement        Placement
+  
+  actualCuberId    Int            @map("actual_cuber_id")
+  actualCuber      PredictionEventCompetitor @relation(fields: [actualCuberId], references: [id])
+
+  @@unique([predictionFormId, event, placement])
+  @@map("prediction_answers")
+>>>>>>> mid-2026-remake
 }

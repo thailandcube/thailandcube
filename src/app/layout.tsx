@@ -1,43 +1,43 @@
 import type { Metadata } from 'next';
-import { Prompt, Kanit } from 'next/font/google';
-import { Providers } from './providers';
-import Header from './components/Header';
-import '../../node_modules/flag-icons/css/flag-icons.min.css';
+import { Prompt } from 'next/font/google';
 import './globals.css';
-
-import { NextIntlClientProvider } from 'next-intl';
-// import Footer from './components/Footer';
+import Navbar from './_components/Navbar';
+import { Providers } from './providers';
+import { getLocale, getMessages } from 'next-intl/server';
+import Footer from './_components/Footer';
+import 'flag-icons/css/flag-icons.min.css';
 
 const prompt = Prompt({
-    subsets: ['latin', 'thai'],
-    weight: ['400', '500', '600']
+  subsets: ['latin', 'thai'],
+  weight: ['400', '500', '600'],
 });
 
-// const kanit = Kanit({
-//     subsets: ['latin', 'thai'],
-//     weight: ['400', '500', '600']
-// });
-
 export const metadata: Metadata = {
-    title: 'ThailandCube',
-    description: 'A web application from ThailandCube',
+  title: 'ThailandCube',
+  description: 'A web application from ThailandCube',
 };
 
-export default async function RootLayout({children}: Readonly<{children: React.ReactNode}>) 
-{
-    return (
-        <html lang='en' className='light'>
-            <body className={`${prompt.className} antialiased`}>
-                <NextIntlClientProvider>
-                    <Providers>
-                        <Header/>
-                        <div className='mt-5'>
-                            {children}
-                        </div>
-                        {/* <Footer/> */}
-                    </Providers>
-                </NextIntlClientProvider>
-            </body>
-        </html>
-    );
+export default async function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
+  return (
+    <html
+      lang={locale}
+      className={`${prompt.className}`}
+      suppressHydrationWarning
+    >
+      <body className='min-h-full flex flex-col'>
+        <Providers locale={locale} messages={messages}>
+          <Navbar/>
+          {children}
+          <Footer/>
+        </Providers>
+      </body>
+    </html>
+  );
 }

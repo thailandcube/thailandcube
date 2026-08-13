@@ -120,10 +120,12 @@ const Header = () =>
                                     <p className='font-semibold'>{session.user.email}</p>
                                 </DropdownItem>
                                 <DropdownItem key='profile' href='/profile'>{t('dropdown.profile')}</DropdownItem>
-                                <DropdownItem key='my-competition'>{t('dropdown.my_competitions')}</DropdownItem>
+                                <DropdownItem key='predictions' href='/predictions'>{t('dropdown.predictions')}</DropdownItem>
+                                {/* <DropdownItem key='my-competition'>{t('dropdown.my_competitions')}</DropdownItem> */}
                                 {/* <DropdownItem key='create-draft-competition' href='/draft-competition'>{t('dropdown.create_new_competition')}</DropdownItem> */}
                                 {isSuperuser ? <DropdownItem key='create-unofficial-competition' href='/new-competition'>{t('dropdown.create_new_competition')}</DropdownItem> : <></>}
                                 {isAdmin ? <DropdownItem key='admin' href='/admin/dashboard'>{t('dropdown.admin')}</DropdownItem> : <></>}
+                                {isAdmin ? <DropdownItem key='manage-predictions' href='/admin/predictions'>{t('dropdown.manage_predictions')}</DropdownItem> : <></>}
                                 <DropdownItem key='logout' color='danger' onPress={() => signOut()}>
                                     {t('dropdown.logout')}
                                 </DropdownItem>
@@ -132,9 +134,9 @@ const Header = () =>
                     </NavbarItem>
                     ) :
                     <NavbarItem>
-                        {/* <Button color='primary' variant='flat' onPress={onLoginOpen}>
+                        <Button color='primary' variant='flat' onPress={onLoginOpen}>
                             {t('login')}
-                        </Button> */}
+                        </Button>
                     </NavbarItem>
                     }
                     <NavbarMenuToggle className='sm:hidden' aria-label={isMenuOpen ? 'Close menu' : 'Open menu'} />
@@ -192,9 +194,9 @@ const Header = () =>
                         </>
                     ) : (
                         <NavbarMenuItem>
-                            {/* <Button color='primary' fullWidth onPress={onLoginOpen}>
+                            <Button color='primary' fullWidth onPress={onLoginOpen}>
                                 {t('login')}
-                            </Button> */}
+                            </Button>
                         </NavbarMenuItem>
                     )}
 
@@ -215,12 +217,12 @@ const Header = () =>
                 <ModalContent>
                 {(onClose) => (
                     <>
-                        <ModalHeader className='flex flex-col gap-1'>Login</ModalHeader>
+                        <ModalHeader className='flex flex-col gap-1'>{t('login')}</ModalHeader>
                         <ModalBody>
-                            <Button as={Link} color='primary' variant='flat' onPress={() => signIn('wca')}><Image src='/img/wca.svg' width={30} height={30}/>Login with WCA</Button>
+                            <Button as={Link} color='primary' variant='flat' onPress={() => signIn('wca')}><Image src='/img/wca.svg' width={30} height={30}/>{t('login_with_wca')}</Button>
                         </ModalBody>
                         <ModalFooter>
-                            <Button color='danger' variant='flat' onPress={onClose}>Close</Button>
+                            <Button color='danger' variant='flat' onPress={onClose}>{t('close')}</Button>
                         </ModalFooter>
                     </>
                 )}
