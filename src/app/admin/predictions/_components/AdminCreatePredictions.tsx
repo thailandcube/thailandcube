@@ -64,6 +64,11 @@ export default function CreatePredictions() {
 
       toast.success('Success!', {description: `Prediction Forms ${name} is created.`});
 
+      setCompetitionId('');
+      setName('');
+      setOpenTime('');
+      setCloseTime('');
+
       router.refresh();
     } 
     catch (error) {

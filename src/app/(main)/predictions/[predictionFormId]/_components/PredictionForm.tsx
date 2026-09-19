@@ -2,6 +2,7 @@
 
 import { submitPrediction } from '@/app/actions/predictions';
 import { EventCodeToFullMap } from '@/app/utils/EnumMapper';
+import { extractLatinName } from '@/app/utils/ExtractLatinName';
 import type { PredictionEventCompetitor, PredictionForm, PredictionRecord, PredictionSubmission } from '@/generated/prisma/client';
 import { Autocomplete, Button, Card, Checkbox, Chip, EmptyState, ErrorMessage, Form, Input, Label, ListBox, Modal, SearchField, Separator, toast, useFilter } from '@heroui/react';
 import { signIn, useSession } from 'next-auth/react';
@@ -105,11 +106,40 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
     return false;
   }, [predictions, uniqueEvents]);
 
+  const checkIsInvalidDnf = (key: string, allowedPlacement: 'CHAMPION' | 'FIRST_RUNNER_UP' | 'SECOND_RUNNER_UP') => {
+    const val = predictions[key];
+    if (!val) return false;
+
+    const cuber = roster.find((c) => c.id === val);
+    if (!cuber) return false;
+
+    if (cuber.name === 'DNF (1st)' && allowedPlacement !== 'CHAMPION') return true;
+    if (cuber.name === 'DNF (2nd)' && allowedPlacement !== 'FIRST_RUNNER_UP') return true;
+    if (cuber.name === 'DNF (3rd)' && allowedPlacement !== 'SECOND_RUNNER_UP') return true;
+
+    return false;
+  };
+
+  const hasAnyInvalidDnf = useMemo(() => {
+    for (const eventCode of uniqueEvents) {
+      if (checkIsInvalidDnf(`${eventCode}_CHAMPION`, 'CHAMPION')) return true;
+      if (checkIsInvalidDnf(`${eventCode}_FIRST_RUNNER_UP`, 'FIRST_RUNNER_UP')) return true;
+      if (checkIsInvalidDnf(`${eventCode}_SECOND_RUNNER_UP`, 'SECOND_RUNNER_UP')) return true;
+    }
+    
+    return false;
+  }, [predictions, uniqueEvents, roster]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (hasAnyDuplicates){
       toast.danger(t('toast.has_duplicates'));
+      return;
+    }
+
+    if (hasAnyInvalidDnf) {
+      toast.danger('Please place DNF options in their correct respective slots.');
       return;
     }
 
@@ -355,9 +385,17 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
               const firstRunnerKey = `${eventCode}_FIRST_RUNNER_UP`;
               const secondRunnerKey = `${eventCode}_SECOND_RUNNER_UP`;
 
-              const isChampInvalid = checkIsDuplicate(champKey, eventCode);
-              const isFirstRunnerInvalid = checkIsDuplicate(firstRunnerKey, eventCode);
-              const isSecondRunnerInvalid = checkIsDuplicate(secondRunnerKey, eventCode);
+              const isChampDuplicate = checkIsDuplicate(champKey, eventCode);
+              const isChampDnfInvalid = checkIsInvalidDnf(champKey, 'CHAMPION');
+              const isChampInvalid = isChampDuplicate || isChampDnfInvalid;
+
+              const isFirstRunnerDuplicate = checkIsDuplicate(firstRunnerKey, eventCode);
+              const isFirstRunnerDnfInvalid = checkIsInvalidDnf(firstRunnerKey, 'FIRST_RUNNER_UP');
+              const isFirstRunnerInvalid = isFirstRunnerDuplicate || isFirstRunnerDnfInvalid;
+
+              const isSecondRunnerDuplicate = checkIsDuplicate(secondRunnerKey, eventCode);
+              const isSecondRunnerDnfInvalid = checkIsInvalidDnf(secondRunnerKey, 'SECOND_RUNNER_UP');
+              const isSecondRunnerInvalid = isSecondRunnerDuplicate || isSecondRunnerDnfInvalid;
 
               return (
                 <div key={eventCode} className='flex flex-col gap-4'>
@@ -390,7 +428,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                           {eventCubers.map((cuber, index) => (
                             <ListBox.Item key={cuber.id.toString()} id={cuber.id.toString()} textValue={cuber.name}>
                               <div className='flex justify-between items-center w-full'>
-                                <span>{index+1} - {cuber.name.split('(')[0].trim()}</span>
+                                <span>{index+1} - {extractLatinName(cuber.name)}</span>
                                 {cuber.wcaId && <span className='text-xs text-default-400'>{cuber.wcaId}</span>}
                               </div>
                             </ListBox.Item>
@@ -398,7 +436,13 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                         </ListBox>
                       </Autocomplete.Filter>
                     </Autocomplete.Popover>
-                    <ErrorMessage>{!!isChampInvalid && <>{t('open.forms.already_selected')}</>}</ErrorMessage>
+                    <ErrorMessage>
+                      {isChampDuplicate 
+                        ? t('open.forms.already_selected') 
+                        : isChampDnfInvalid 
+                        ? t('open.forms.dnf_slot_1st')
+                        : null}
+                    </ErrorMessage>
                   </Autocomplete>
                   <Autocomplete
                     isRequired
@@ -427,7 +471,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                           {eventCubers.map((cuber, index) => (
                             <ListBox.Item key={cuber.id.toString()} id={cuber.id.toString()} textValue={cuber.name}>
                               <div className='flex justify-between items-center w-full'>
-                                <span>{index+1} - {cuber.name.split('(')[0].trim()}</span>
+                                <span>{index+1} - {extractLatinName(cuber.name)}</span>
                                 {cuber.wcaId && <span className='text-xs text-default-400'>{cuber.wcaId}</span>}
                               </div>
                             </ListBox.Item>
@@ -435,7 +479,13 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                         </ListBox>
                       </Autocomplete.Filter>
                     </Autocomplete.Popover>
-                    <ErrorMessage>{!!isFirstRunnerInvalid && <>{t('open.forms.already_selected')}</>}</ErrorMessage>
+                    <ErrorMessage>
+                      {isFirstRunnerDuplicate 
+                        ? t('open.forms.already_selected') 
+                        : isFirstRunnerDnfInvalid 
+                        ? t('open.forms.dnf_slot_2nd')
+                        : null}
+                    </ErrorMessage>
                   </Autocomplete>
                   <Autocomplete
                     isRequired
@@ -464,7 +514,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                           {eventCubers.map((cuber, index) => (
                             <ListBox.Item key={cuber.id.toString()} id={cuber.id.toString()} textValue={cuber.name}>
                               <div className='flex justify-between items-center w-full'>
-                                <span>{index+1} - {cuber.name.split('(')[0].trim()}</span>
+                                <span>{index+1} - {extractLatinName(cuber.name)}</span>
                                 {cuber.wcaId && <span className='text-xs text-default-400'>{cuber.wcaId}</span>}
                               </div>
                             </ListBox.Item>
@@ -472,7 +522,13 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                         </ListBox>
                       </Autocomplete.Filter>
                     </Autocomplete.Popover>
-                    <ErrorMessage>{!!isSecondRunnerInvalid && <>{t('open.forms.already_selected')}</>}</ErrorMessage>
+                    <ErrorMessage>
+                      {isSecondRunnerDuplicate 
+                        ? t('open.forms.already_selected') 
+                        : isSecondRunnerDnfInvalid 
+                        ? t('open.forms.dnf_slot_3rd')
+                        : null}
+                    </ErrorMessage>
                   </Autocomplete>
                 </div>
               );
@@ -498,7 +554,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
               <Button 
                 variant='primary'
                 type={isReadOnly ? 'button' : 'submit'} 
-                isDisabled={isReadOnly || hasAnyDuplicates || !termsAccepted}
+                isDisabled={isReadOnly || hasAnyDuplicates || hasAnyInvalidDnf || !termsAccepted}
                 isPending={isLoading}
                 className='w-full font-bold text-lg py-6'
               >
@@ -506,7 +562,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
                   ? 'read_only' 
                   : isSubmitted 
                   ? 'update'
-                  : hasAnyDuplicates 
+                  : (hasAnyDuplicates || hasAnyInvalidDnf) 
                   ? 'fix_errors' 
                   : 'submit'}`)}
               </Button>

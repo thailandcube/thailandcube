@@ -193,7 +193,10 @@
           "submit": "Submit Predictions",
           "update": "Update Predictions",
           "read_only": "Prediction Locked In",
-          "fix_errors": "Fix Errors to Submit"
+          "fix_errors": "Fix Errors to Submit",
+          "dnf_slot_1st": "If wish to choose DNF in this slot, select DNF (1st) only.",
+          "dnf_slot_2nd": "If wish to choose DNF in this slot, select DNF (2nd) only.",
+          "dnf_slot_3rd": "If wish to choose DNF in this slot, select DNF (3rd) only."
         }
       },
       "toast": {

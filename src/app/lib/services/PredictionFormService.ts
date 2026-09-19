@@ -25,6 +25,8 @@ export class PredictionFormService extends Service<PredictionForm, PredictionFor
 
       const competitorInserts = [];
 
+      const DNF_EVENTS = ['E333BF', 'E444BF', 'E555BF', 'E333MBF', 'E333FM'];
+
       for (const [eventId, cubers] of Object.entries(allRegisteredCubers)) {
         const prismaEvent = EventCodeToPrismaMap[eventId as keyof typeof EventCodeToPrismaMap];
 
@@ -40,6 +42,21 @@ export class PredictionFormService extends Service<PredictionForm, PredictionFor
             event: prismaEvent,
             pos: cuber.pos ?? 999,
           });
+        }
+
+        if (DNF_EVENTS.includes(prismaEvent as string)) {
+          const fakeDNFCubers = ['DNF (1st)', 'DNF (2nd)', 'DNF (3rd)'];
+          
+          for (let i = 0; i < fakeDNFCubers.length; i++) {
+            competitorInserts.push({
+              predictionFormId: form.id,
+              name: fakeDNFCubers[i],
+              wcaId: null,
+              countryIso2: 'XX',
+              event: prismaEvent,
+              pos: 1000 + i,
+            });
+          }
         }
       }
 
