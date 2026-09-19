@@ -8,7 +8,11 @@ import { AbstractIntlMessages, NextIntlClientProvider } from 'next-intl';
 export function Providers({ children, locale, messages }: { children: React.ReactNode, locale: string, messages: AbstractIntlMessages }) {
   return (
     <SessionProvider>
-      <NextIntlClientProvider locale={locale} messages={messages}>
+      <NextIntlClientProvider 
+        locale={locale} 
+        messages={messages}
+        timeZone='Asia/Bangkok'
+      >
         {/* <ThemeProvider attribute='class' defaultTheme='system' themes={['light', 'dark']}> */}
           <Toast.Provider placement='top end'/>
           {children}
