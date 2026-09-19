@@ -105,7 +105,7 @@ export async function getAllPredictionForms() {
     return { success: true, data };
   }
   catch (error: any) {
-    console.error('Failed to get all forms')
+    console.error('Failed to get all forms', error);
     return { success: false, error: error.message || 'An unexpected error occurred' };
   }
 }
