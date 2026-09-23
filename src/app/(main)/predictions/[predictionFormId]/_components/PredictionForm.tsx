@@ -277,7 +277,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
           <Card.Content>
             <h2 className='text-2xl font-bold'>{t('close.title')}</h2>
             <p className='text-center text-default-500 mt-2'>
-              {t('close.subtitle')}
+              {t('close.subtitle', {formName: form.name})}
               {/* {form.isLocked 
                 ? `Submissions for ${form.name} have been locked by an admin.` 
                 : `We are no longer accepting predictions for ${form.name}.`} */}
@@ -338,6 +338,7 @@ export default function PredictionForm({ form, roster, existingSubmission }: Pro
               <li>{t('open.rules.scoring')}</li>
               <li>{t('open.rules.duplicates')}</li>
               <li>{t('open.rules.prizes')}</li>
+              <li>{t('open.rules.appearance')}</li>
             </ul>
           </div>
 
