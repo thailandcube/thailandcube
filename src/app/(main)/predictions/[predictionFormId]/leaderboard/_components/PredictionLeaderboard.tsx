@@ -83,13 +83,13 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
 
   const getPredictionStatusStyles = (status: string) => {
     switch (status) {
-      case 'CORRECT': 
+      case 'CORRECT':
         return 'border-success-200 bg-success-50 text-success-800';
-      case 'PODIUM': 
+      case 'PODIUM':
         return 'border-warning-200 bg-warning-50 text-warning-800';
-      case 'INCORRECT': 
+      case 'INCORRECT':
         return 'border-danger-200 bg-danger-50 text-danger-800';
-      default: 
+      default:
         return 'border-default-100 bg-default-50 text-default-800';
     }
   };
@@ -116,7 +116,7 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
                   <Table.Column>{t('table.player')}</Table.Column>
                   <Table.Column>WCA ID</Table.Column>
                   <Table.Column>{t('table.score')}</Table.Column>
-                  <Table.Column>{t('table.submitted_at')}</Table.Column>
+                  {/*<Table.Column>{t('table.submitted_at')}</Table.Column>*/}
                   <Table.Column></Table.Column>
                 </Table.Header>
                 <Table.Body renderEmptyState={() => <p className='text-2xl font-semibold text-center mx-auto'>{t('table.no_submissions')}</p>}>
@@ -142,15 +142,15 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
                           {sub.score} pts
                         </Chip>
                       </Table.Cell>
-                      <Table.Cell>
+                      {/*<Table.Cell>
                         <span className='text-sm text-default-500'>
                           {new Date(sub.createdAt).toLocaleString()}
                         </span>
-                      </Table.Cell>
+                      </Table.Cell>*/}
                       <Table.Cell>
-                        <Button 
-                          size='sm' 
-                          variant='primary' 
+                        <Button
+                          size='sm'
+                          variant='primary'
                           onPress={() => handleViewPredictions(sub)}
                         >
                           {t('table.view_picks')}
@@ -182,7 +182,7 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
                 <div className='flex flex-col gap-6'>
                   {Object.entries(groupedModalPredictions).map(([eventCode, records]) => {
                     const eventName = EventCodeToFullMap[eventCode as keyof typeof EventCodeToFullMap] || eventCode;
-                    
+
                     const sortedRecords = [...records].sort((a, b) => {
                       const order = ['CHAMPION', 'FIRST_RUNNER_UP', 'SECOND_RUNNER_UP'];
                       return order.indexOf(a.placement) - order.indexOf(b.placement);
@@ -195,8 +195,8 @@ export default function PredictionLeaderboard({ form, submissions }: Props) {
                         </h3>
                         <div className='flex flex-col gap-1.5'>
                           {sortedRecords.map((record) => (
-                            <div 
-                              key={record.id} 
+                            <div
+                              key={record.id}
                               className={`flex justify-between items-center px-3 py-2 rounded-md border text-sm ${getPredictionStatusStyles(record.status)}`}
                             >
                               <div>
