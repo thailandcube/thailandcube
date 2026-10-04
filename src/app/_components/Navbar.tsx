@@ -23,7 +23,7 @@ import { getUserRole } from '../actions/users';
 const menuItems = [
   { name: 'About Us', href: 'about' },
   { name: 'Resources', href: 'resources' },
-  { name: 'Statistics', href: 'statistics' },
+  // { name: 'Statistics', href: 'statistics' },
   { name: 'FAQs', href: 'faqs' },
 ];
 
